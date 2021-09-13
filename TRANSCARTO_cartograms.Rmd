@@ -1,0 +1,79 @@
+---
+title: "FAIRE DES CARTOGRAMS DANS R"
+author: "Bronner A.C. & LAMBERT N."
+date: "2021"
+output:
+  rmdformats::readthedown
+link_citations: true
+  
+---
+
+**Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.**
+
+# 1. Préambule
+
+### Les données
+
+- Les données statistiques sur lesquelles nous travaillons ici sont issues du projet [Maddison Database 2018](https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2018.xlsx) piloté par Jutta Bolt, Robert Inklaar, Herman de Jong et Jan Luiten van Zanden. Les données poposées ici (population et PIB) sont sous licence [Creative Commons](https://creativecommons.org/licenses/by/4.0/). La documentation est disponible sur le [site web du projet](https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2018?lang=en)
+
+- Le fond de carte des pays du monde sont issues du su projet [Magrit](http://magrit.cnrs.fr/)
+
+### Import et mise en forme des données
+
+1. les données statistiques
+
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library(readxl)
+maddison = data.frame(read_excel("data/mpd2020.xlsx", sheet = "Full data"))
+maddison <- maddison[maddison$year>=1950,]
+maddison$gdp <- maddison$gdppc * maddison$pop / 1000000
+```
+
+2. les données géométriques
+
+Les pays
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library(sf)
+countries <- st_read("data/world_countries_data.shp", quiet = TRUE )
+countries <- countries[,c("ISO3", "NAMEen", "NAMEfr","geometry")]
+colnames(countries) <- c("id", "NAMEen", "NAMEfr","geometry")
+```
+
+Graticule & sphere
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+sphere <- st_read("data/ne_110m_wgs84_bounding_box.shp", quiet = TRUE )
+graticule <- st_read("data/ne_110m_graticules_20.shp", quiet = TRUE )
+```
+
+Projection
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+crs <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+countries <- st_transform(countries, crs)
+graticule <- st_transform(graticule, crs)
+sphere <- st_transform(sphere, crs)
+```
+
+
+### Création d'un template cartographique
+
+
+# Le package cartograms
+
+### Cartogrames discontinus (Olsen)
+
+### Cartogrammes contigus (Dougnik)
+
+# Le package packcircles
+
+### Dorling cartograms
+
+### Dots cartograms
+
+# Le package cartogramR
+
+# ....
+
