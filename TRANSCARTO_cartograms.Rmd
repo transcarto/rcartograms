@@ -4,43 +4,221 @@ author: "Bronner A.C. & LAMBERT N."
 date: "2021"
 output:
   rmdformats::readthedown
+bibliography: biblio/biblio.bib
 link_citations: true
   
 ---
 
 **Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.**
 
-# 1. Données
+# Packages
 
-les données statistiques
+installer les packages suivants ..... + version min
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
-data <- read.csv("data/popisrere.csv")
+
+```{r, eval = FALSE, message = FALSE, warning = FALSE}
+install.packages(knitr)
+install.packages(sf)
+install.packages(mapsf)
+install.packages(packcircles)
+install.packages(cartogram)
 ```
 
-les données géométriques
+
+# Import et mise en forme des données
+
+Le package **sf** bla bla bla.....
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 library(sf)
 communes <- st_read("data/isere.geojson", quiet = TRUE ) %>% st_transform(2154)
+data <- read.csv("data/popisrere.csv",  dec = ",")
+communes = merge(x = communes, y = data, by = "id")
 ```
-
-Jointure
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
-communes = merge(x = communes, y = data, by = "id", all.x = TRUE)
-View(communes)
+knitr::kable(communes[c(0:10),], row.names = F, digits = 1)
 ```
 
+# Le package mapsf
 
-### Création d'un template cartographique
+Le package **mapsf** permet de faire des carte sthématiques dans R.
 
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library(mapsf)
+mf_export(
+  communes,
+  export = "png",
+  filename = paste0("maps/plot.png"),
+  res = 96,
+  theme = "default"
+)
+mf_map(communes, col = "#c76fa0",border = "white", lwd = 0.5, add = TRUE)
+mf_title("Créer une carte avec mapsf")
+mf_scale(size = 20, pos = "bottomright", lwd = 1.5, cex = 0.6, col = "#383838", unit = "km")
+dev.off()
+```
 
-# Le package cartograms
+<img src = "maps/plot.png"></img>
+
+Représenter des données quantitatives absolues.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+
+mf_export(
+  communes,
+  export = "png",
+  filename = paste0("maps/proSymbols.png"),
+  res = 96,
+  theme = "default"
+)
+mf_map(communes, col = "#baaba2",border = "white", lwd = 0.5, add = TRUE)
+mf_map(communes, var = "pop2018", type = "prop", col = "#c76fa0",
+       border = "#61122f", lwd = 0.5, leg_title = "Population, 2018", 
+       add = TRUE)
+mf_title("Symboles proportionnels avec mapsf")
+mf_scale(size = 20, pos = "bottomright", lwd = 1.5,
+         cex = 0.6, col = "#383838", unit = "km")
+dev.off()
+```
+
+<img src = "maps/proSymbols.png"></img>
+
+# Le package packcircles (R >= 3.2)
+
+Le package *packcirles* propose 3 algorithmes simples pour déplacer des diques sur un plan 2D de telle sorte qu'ils ne se supperposent pas. Nous pouvons l'utiliser pour créer des cartogrammes de Dorling [@dorling1996area].
+
+Création d'un ficher de données siplifié avec les coordonnées des centroides des communes.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+dots = communes
+st_geometry(dots) <- st_centroid(sf::st_geometry(dots),of_largest_polygon = TRUE)
+dots <- data.frame(dots$id, dots["pop2018"], st_coordinates(dots))
+dots = dots[,c("dots.id","X","Y","pop2018")]
+colnames(dots) <- c("id","x","y","v")
+dots <- dots[!is.na(dots$v),]
+knitr::kable(dots[c(0:5),], row.names = F, digits = 1)
+```
+
+La fonction *circleRepelLayout* prend un ensemble de cercles dans un cadre de données et utilise la répulsion itérative pour essayer de trouver un arrangement sans chevauchement où tous les centres des cercles se trouvent à l'intérieur d'un rectangle de délimitation. Si aucun arrangement de ce type ne peut être trouvé dans le nombre maximum d'itérations spécifié, la dernière tentative est renvoyée.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library("packcircles")
+k = 300 # pour ajuster la taille des cercles
+itermax = 10 # nombre d'iterations
+dat.init <- dots[,c("x","y","v")]
+dat.init$v <- sqrt(dat.init$v * k)
+simulation <- circleRepelLayout(x = dat.init, xysizecols = 1:3,
+                                wrap = FALSE, sizetype = "radius",
+                                maxiter = itermax, weights =1)$layout
+knitr::kable(simulation[c(0:5),], row.names = F, digits = 1)
+```
+
+Affichage cartographique
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+circles <- st_buffer(sf::st_as_sf(simulation, coords =c('x', 'y'),
+                      crs = sf::st_crs(communes)), dist = simulation$radius)
+circles$v = dots$v
+
+mf_export(
+  communes,
+  export = "png",
+  filename = paste0("maps/dorling.png"),
+  res = 96,
+  theme = "default"
+)
+mf_map(communes, col = "#baaba2",border = "#baaba2", lwd = 0.5, add = TRUE)
+mf_map(circles, col = "#c76fa0",border = "#61122f", lwd = 0.5, add = TRUE)
+
+mf_title("Cartogrammes de Dorling avec le package packcircles")
+mf_scale(size = 20, pos = "bottomright", lwd = 1.5,
+         cex = 0.6, col = "#383838", unit = "km")
+dev.off()
+
+```
+
+<img src = "maps/dorling.png"></img>
+
+# Le package cartogram
+
+Il propose entre autre une façon de faire des cartogrammes de Dorling un peu plus simple.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library(cartogram)
+dorling = cartogram_dorling(communes, "pop2018", k = 1)
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+mf_export(
+  communes,
+  export = "png",
+  filename = paste0("maps/dorling2.png"),
+  res = 96,
+  theme = "default"
+)
+mf_map(communes, col = "#baaba2",border = "#baaba2", lwd = 0.5, add = TRUE)
+mf_map(st_geometry(dorling), col = "#c76fa0",border = "#61122f", lwd = 0.5, add = TRUE)
+mf_title("Cartogramme de Dorling avec le package cartogram")
+mf_scale(size = 20, pos = "bottomright", lwd = 1.5,
+         cex = 0.6, col = "#383838", unit = "km")
+dev.off()
+
+```
+
+<img src = "maps/dorling2.png"></img>
 
 ### Cartogrames discontinus (Olsen)
 
+Bla bla bla.... [@olson1976noncontiguous]
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+Olsen <- cartogram_ncont(communes, "pop2018")
+
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+mf_export(
+  communes,
+  export = "png",
+  filename = paste0("maps/Olsen.png"),
+  res = 96,
+  theme = "default"
+)
+mf_map(Olsen, col = "#c76fa0",border = "white", lwd = 0.5, add = TRUE)
+mf_title("Cartogramme discontinu avec le package cartogram")
+mf_scale(size = 20, pos = "bottomright", lwd = 1.5,
+         cex = 0.6, col = "#383838", unit = "km")
+dev.off()
+
+```
+
+<img src = "maps/Olsen.png"></img>
+
 ### Cartogrammes contigus (Dougnik)
+
+Bla bla bla.... [@dougenik1985algorithm]
+
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+Dougenik <- cartogram_cont(communes, "pop2018")
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+mf_export(
+  communes,
+  export = "png",
+  filename = paste0("maps/Dougenik.png"),
+  res = 96,
+  theme = "default"
+)
+mf_map(Dougenik, col = "#c76fa0",border = "white", lwd = 0.5, add = TRUE)
+mf_title("Cartogramme de Dougenik avec le package cartogram")
+dev.off()
+
+```
+
+<img src = "maps/Dougenik.png"></img>
 
 # Le package packcircles
 
@@ -56,5 +234,5 @@ View(communes)
 
 Explorez les cartogrammes à l'échelle mondiale.
 
-
+# Blibliographie
 
