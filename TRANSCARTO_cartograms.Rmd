@@ -22,6 +22,8 @@ install.packages(sf)
 install.packages(mapsf)
 install.packages(packcircles)
 install.packages(cartogram)
+install.packages(recmap)
+install.packages("https://cran.r-project.org/src/contrib/Archive/cartogramR/cartogramR_1.0-1.tar.gz", repos = NULL, type = "source")
 ```
 
 
@@ -201,7 +203,7 @@ Bla bla bla.... [@dougenik1985algorithm]
 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
-Dougenik <- cartogram_cont(communes, "pop2018")
+Dougenik <- cartogram_cont(communes, "pop2018", prepare = "none", itermax = 150, maxSizeError = 1.5)
 ```
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
@@ -220,15 +222,49 @@ dev.off()
 
 <img src = "maps/Dougenik.png"></img>
 
-# Le package packcircles
+# Recmap
 
-### Dorling cartograms
+A TESTER
 
-### Dots cartograms
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+
+library(recmap)
+library(sp)
+library(sf)
+library(cartography)
+
+data(nuts2006)
+
+nuts0.spdf@data <- nuts0.df
+x <- nuts0.spdf
+x <- st_as_sf(x)
+
+coords <- data.frame(st_coordinates(st_centroid(st_geometry((x)))))
+bb <- lapply(st_geometry(x), function(x){st_bbox(x)})
+dx <- unlist(lapply(bb, function(x){x[3]-x[1]})) * 0.5
+dy <- unlist(lapply(bb, function(x){x[4]-x[2]})) * 0.5
+
+df <- data.frame(x = coords$X, 
+                 y = coords$Y, 
+                 dx = dx, 
+                 dy = dy, 
+                 z = x$pop2008,
+                 name = x$id)
+par(mar = c(0,0,0,0), bg = "lemonchiffon", mfrow = c(1,3))
+plot(st_geometry(x), col = "ivory2")
+
+plot.recmap(df, col = 'ivory2', border = "black")
+
+cartog <- recmap(df)
+plot(cartog,  col = 'ivory2', border = "black")
+
+```
 
 # Le package cartogramR
 
-# ....
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library("cartogramR")
+```
 
 # A vous de jouer
 
