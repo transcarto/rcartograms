@@ -236,8 +236,7 @@ prepare	: mettre "adjust" permer d'acceler le temps de calcul.
 threshold	: seuil pour la préparation des données
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
-Dougenik <- cartogram_cont(communes, "pop2018", prepare = "adjust", itermax = 150, maxSizeError = 1.15)
-View(Dougenik)
+Dougenik <- cartogram_cont(communes, "pop2018", prepare = "none", itermax = 150, maxSizeError = 1.15)
 ```
 
 Calcul des érreurs
