@@ -106,7 +106,7 @@ dev.off()
 ```
 <img src = "maps/template.png"></img>
 
-Représenter des données quantitatives absolues avec mapsf
+## Symboles proportionnels
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results ="hide"}
 template("Symboles proportionnels (mapsf)", "maps/prop.png")
@@ -124,9 +124,32 @@ mf_map(communes, var = "pop2018", col = col, border = "#6b4266", type = "prop",
        inches = 0.8, leg_title_cex = 1.2, leg_val_cex	= 0.8, symbol = "square",
        leg_title = "Nombre d'habitants, 2018")
 dev.off()
+
 ```
 
 <img src = "maps/prop2.png"></img>
+
+## Dot density maps
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results ="hide"}
+dotdensitymap <- function(x, var, onedot = 1, radius = 1){
+x <- x[,c("id",var,"geometry")]
+x[,"v"] <- round(x[,var] %>% st_drop_geometry() /onedot,0)
+dots <- st_sample(x, x$v, type = "random", exact = TRUE)
+circles <- st_buffer(dots, dist = radius)
+return (circles)
+}
+```
+
+```{r dotdensitymap, eval = TRUE, message = FALSE, warning = FALSE, results ="hide"}
+onedot = 500
+dots = dotdensitymap(x = communes, var = "pop2018", onedot = onedot, radius = 300)
+template(paste0("Un point = ",onedot," habitants"), "maps/dotdensity.png")
+mf_map(dots, col = col, border = "#520a2c", lwd = 0.5, add = TRUE)
+dev.off()
+```
+
+<img src = "maps/dotdensity.png"></img>
 
 # packcircles
 
@@ -146,7 +169,6 @@ knitr::kable(dots[c(0:5),], row.names = F, digits = 1)
 
 La fonction *circleRepelLayout()* prend un ensemble de cercles dans un cadre de données et utilise la répulsion itérative pour essayer de trouver un arrangement sans chevauchement où tous les centres des cercles se trouvent à l'intérieur d'un rectangle de délimitation. Si aucun arrangement de ce type ne peut être trouvé dans le nombre maximum d'itérations spécifié, la dernière tentative est renvoyée.
 
-
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 library("packcircles")
 
@@ -163,7 +185,6 @@ knitr::kable(simulation[c(0:5),], row.names = F, digits = 1)
 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, resultes = "hide"}
-
 circles <- st_buffer(sf::st_as_sf(simulation, coords =c('x', 'y'),
                       crs = sf::st_crs(communes)), dist = simulation$radius)
 circles$v = dots$v
@@ -172,7 +193,6 @@ template("Dorling (packcircles)", "maps/dorling1.png", scale = FALSE)
 mf_map(isere, col = "#CCCCCC", border = "white", lwd = 0.5, add = TRUE)
 mf_map(circles,col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
 dev.off()
-
 ```
 
 <img src = "maps/dorling1.png"></img>
@@ -187,11 +207,11 @@ library(cartogram)
 
 ## Dorling
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
+```{r Dorling1, eval = TRUE, message = FALSE, warning = FALSE}
 dorling = cartogram_dorling(communes, "pop2018", k = 1.8)
 ```
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+```{r Dorling2, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 template("Dorling (cartogram)", "maps/dorling2.png", scale = FALSE)
 mf_map(isere, col = "#CCCCCC", border = "white", lwd = 0.5, add = TRUE)
 mf_map(dorling, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
@@ -204,17 +224,16 @@ dev.off()
 
 Bla bla bla cartogrammes discontinus.... [@olson1976noncontiguous]
 
-
 x	: un objet sf
 weight : nom de la variable
 k : facteur pour augmenter la taille des polygons
 inplace	: Si VRAI, chaque polygone est modifié à sa place initiale, si FAUX, les multi-polygones sont centrés sur leur centroïde initial
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
+```{r Olsen1, eval = TRUE, message = FALSE, warning = FALSE}
 olsen <- cartogram_ncont(communes, "pop2018", k = 1, inplace = TRUE)
 ```
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+```{r Olsen2, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 template("Olsen (cartogram)", "maps/olsen.png", basemap = FALSE, scale = FALSE)
 mf_map(isere, col = "#CCCCCC30", border = "white", lwd = 0.5, add = TRUE)
 mf_map(olsen, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
@@ -227,7 +246,6 @@ dev.off()
 
 Bla bla bla.... [@dougenik1985algorithm]
 
-
 x	: un objet sf
 weight : om de la variable
 itermax	: nombre d'itérations maximum si maxSizeError n'est pas atteint
@@ -235,35 +253,204 @@ maxSizeError : la déformation s'arrete si l'erreur moyenne est inférieur à ce
 prepare	: mettre "adjust" permer d'acceler le temps de calcul.
 threshold	: seuil pour la préparation des données
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
-Dougenik <- cartogram_cont(communes, "pop2018", prepare = "none", itermax = 150, maxSizeError = 1.15)
+```{r Dougenik1, eval = TRUE, message = FALSE, warning = FALSE}
+Dougenik <- cartogram_cont(communes, "pop2018", prepare = "none", itermax = 10, maxSizeError = 1.15)
 ```
 
 Calcul des érreurs
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
+```{r Dougenik2, eval = TRUE, message = FALSE, warning = FALSE}
 sumarea = sum(as.numeric(st_area(Dougenik)))
 sumpop = sum(Dougenik$pop2018)
 Dougenik$error = (as.numeric(st_area(Dougenik)) /  sumarea) / (Dougenik$pop2018 / sumpop) * 100
 summary(Dougenik$error)
-bks = c(min(Dougenik$error),70,80,90,100,110,120,max(Dougenik$error)) 
+bks = c(min(Dougenik$error),70,80,90,100,110,120,max(Dougenik$error))
 cols = c("#d53e4f", "#f46d43","#fdae61","#fee08b","#e6f598","#abdda4", "#66c2a5")
 ```
 
 Affichage de la carte
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+```{r Dougenik3, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 template("Dougenik (cartogram)", "maps/dougenik.png", basemap = FALSE, scale = FALSE)
-#mf_map(Dougenik, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
 mf_map(x = Dougenik, type = "choro",var = "error", pal = cols, breaks = bks, border = "#6b4266", lwd = 0.5, add = TRUE)
 dev.off()
 ```
 
 <img src = "maps/dougenik.png"></img>
 
+# RecMap
+
+
+Recmap [@heilmann2004recmap] [@panse2016rectangular] est un package développé par Christian Panse. Il perlet de concertir les géométries des unités spatiales en rectangles dont la surace est définie en fonction d'une donnée statitique sauntitative absolue. L'algorithe de RecMap est disponible [ici](https://ieeexplore.ieee.org/document/1382888). Développé en C++11, le package dépend des packages GA (>= 3.1), Rcpp (>= 1.0), sp(>= 1.3)
+
+Attention, il ne fonctionne que sur un nombre limité d'unités territoriales. Et même dans ce cas, il ne fonctionne pas très bien, notamment avec les petites unités spatiales. 
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+library(recmap)
+```
+
+Ici un exemple sur les pays d'Europe.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+europe <- st_read("data/europe.geojson")
+```
+
+Préparation des données
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+coords = data.frame(st_coordinates(st_centroid(st_geometry(europe))))
+bb <- lapply(st_geometry(europe), function(x){st_bbox(x)})
+dx <- unlist(lapply(bb, function(x){x[3]-x[1]})) / 2
+dy <- unlist(lapply(bb, function(x){x[4]-x[2]})) / 2
+
+df <- data.frame(x = coords$X, 
+                 y = coords$Y, 
+                 dx = dx, 
+                 dy = dy, 
+                 z = europe$pop2008,
+                 name = europe$id)
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+knitr::kable(df[c(0:10),], row.names = F, digits = 1)
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+template("", "maps/recmap1.png", basemap = FALSE, scale = FALSE)
+plot.recmap(df, col = NA, border = col, lwd=4,  col.text = col)
+dev.off()
+```
+
+<img src = "maps/recmap1.png"></img>
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+cartog <- recmap(df)
+template("", "maps/recmap2.png", basemap = FALSE, scale = FALSE)
+plot(cartog[!cartog$name %in% c("IS","MT"),],  col = col, border = "white")
+dev.off()
+```
+
+NB : IS et MT n'ont pu être placés. On les supprime à l'affichage. 
+
+<img src = "maps/recmap2.png"></img>
+
 # cartogramR
 
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library(cartogramR)
+```
+
+Le package cartogramR est déveoppé par Pierre-Andre Cornillon et Florent Demoraes de l'université de Rennes. Le package propose les méthodes *flow based cartogram* [@gastner2004diffusion], *fast flow based cartogram* [@gastner2018fast] et *rubber band based cartogram* [@dougenik1985algorithm]. La méthode flow based cartogram est basée sur [go_cart](https://github.com/Flow-Based-Cartograms/go_cart).
+
+Attention, cartogramR n'est pas/plus sur le CRAN. L'archive est néanmoins disponible et permet l'installation. 
+
+la fonction *precartogramR()* aide à choisir la taille de la grille de déformation (calcul un peu long). 
+on choisit donc a minima la grille telle que le minimum d'intersections est superieur ou egal a un (ici un pas de grille de 256 peut faire l'affaire)
+
+```{r precartogramR, eval = TRUE, message = FALSE, warning = FALSE}
+precarto <- precartogramR(communes, method = "GastnerSeguyMore")
+summary(precarto)
+```
+
+la fonction *cartogramR()* parmet de calculer le cartogramme en tant que tel selon les 3 méthodes proposées : GastnerSeguyMore" (ou "gsm), "GastnerNewman" (ou "gn), "DougenikChrismanNiemeyer" (ou "dcn"). L'option *L=256* permet de choisir la taille de la grille. L'option *grid=TRUE* (pour les méthodes "gsm" et "gn") permet d'afficher la grille de déformation. L'option *maxit=50* permet de définir le nombre d'itérations max (défaut = 50).
+
+```{r cartogramR, eval = TRUE, message = FALSE, warning = FALSE}
+GastnerSeguy <- cartogramR(communes, count="pop2018", method="GastnerSeguyMore", options=list(L=256, grid=TRUE, maxit = 5))
+```
+
+La fonction *make_layer()* permet de récupérer la grille de calcul  (mais aussi la grille d'origine, les centroides, etc)
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+grid <- make_layer(GastnerSeguy, type = c("final_graticule"))
+```
+
+Ensuite, il est très facile d'afficher le cartogram avec plot (via *sf*) ou comme précédemment, avec le package *mapsf*.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+template("Gastner, Seguy & More", "maps/gastnerseguy.png", basemap = FALSE, scale = FALSE)
+mf_map(GastnerSeguy$cartogram, col = col, border = "white", lwd = 1, add = TRUE)
+mf_map(grid, col = NA, border = "#6b4266", lwd = 0.05, add = TRUE)
+dev.off()
+```
+
+<img src = "maps/gastnerseguy.png"></img>
+
+La fonction residuals() permet de calculer les erreurs liées à la déformation (erreur relative : taille finale / taille theorique * 100)
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+table = cbind(GastnerSeguy$initial_data[,c("id","pop2018")] %>% st_drop_geometry(),
+      orig_area = GastnerSeguy$orig_area,
+      final_area = GastnerSeguy$final_area,
+      errors = residuals(GastnerSeguy, type = "relative error")*100
+      )
+knitr::kable(table[c(0:10),], row.names = F, digits = 1)
+```
+
+Export au format sf
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+st_write(as.sf(GastnerSeguy),"files/GastnerSeguy.gpkg", delete_layer=TRUE)
+# GastnerSeguy_sf = st_as_sf(table, geometry = GastnerSeguy$cartogram)
+# st_write(GastnerSeguy_sf,"files/GastnerSeguy.gpkg", delete_layer=TRUE)
+```
+
 # Variations
+
+## Dots Cartograms
+
+La méthode des dots cartograms est une représentation cartographique à l'intersection des cartogrammes de Dorling et des cartes par points. Les premières cartes utilisant cette méthodes ont été réalisées sur les données du Covid ([voir](https://analytics.huma-num.fr/Nicolas.Lambert/covid19/) et [voir](https://www.humanite.fr/covid-carte-interactive-visualisez-les-effets-dun-de-crise-sanitaire-sur-votre-region-697121)). Article à paraitre. Voir aussi sur [Observable](https://observablehq.com/d/23eaf5593be0ed2f)
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+dotcartogram = function(x,var,itermax,onedot,radius){
+crs = sf::st_crs(x)
+coords <- st_coordinates(st_centroid(sf::st_geometry(x),of_largest_polygon = TRUE))
+x <- x[c("id",var)] %>% st_drop_geometry()
+x <- data.frame(x, coords)
+colnames(x) <- c("id","v","x","y")
+x$v <- round(x$v/onedot,0)
+x <- x[x$v > 0,]
+dots <- x[x$v == 1,c("x","y","v")]
+rest <-  x[x$v  > 1,c("x","y","v")]
+
+nb <- nrow(rest)
+  for (i in 1:nb){
+    new <- rest[i,]
+    new$v <- 1
+    for (j in 1:rest$v[i]){ dots <- rbind(dots,new)}
+  }
+  
+dots$x <- jitter(dots$x)
+dots$y <- jitter(dots$y)
+dots$v <- radius
+  
+simulation <- circleRepelLayout(x = dots, xysizecols = 1:3,
+                                  wrap = FALSE, sizetype = "radius",
+                                  maxiter = itermax, weights =1)$layout
+
+circles <- st_buffer(sf::st_as_sf(simulation, coords =c('x', 'y'),
+                                    crs = crs), dist = radius) 
+return(circles)
+}
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+onedot = 1000
+dc = dotcartogram(x = communes, var = "pop2018", itermax = 120,
+                  onedot = onedot, radius = 600)
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+template(paste0("Un point = ",onedot," personnes"), "maps/dotcartogram.png", scale = FALSE)
+mf_map(isere, col = "#CCCCCC", border = "white", lwd = 0.5, add = TRUE)
+mf_map(dc, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
+dev.off()
+```
+
+<img src = "maps/dotcartogram.png"></img>
+
+## Anti Cartogramme
+
+## Hexbin...
 
 # A vous de jouer
 
