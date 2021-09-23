@@ -63,8 +63,8 @@ theme = mf_theme(x = "default", bg = "#f0f0f0", tab = FALSE,
                    pos = "center", line = 2, inner = FALSE, 
                    fg = col, mar = c(0,0, 2, 0),cex = 1.9)
 
-template = function(title, file, basemap = TRUE, scale = TRUE){
-
+template = function(title, file, note = "", basemap = TRUE, scale = TRUE){
+  
   mf_export(
     communes,
     export = "png",
@@ -73,19 +73,19 @@ template = function(title, file, basemap = TRUE, scale = TRUE){
     res = 96,
     theme = theme, 
     expandBB = c(-.02,0,-.02,0)
-)
+  )
   
-if (basemap == TRUE){
-  mf_shadow(x = communes, col = "grey50", cex = 1, add = TRUE)
-  mf_map(communes, col ="#CCCCCC", border = "white", lwd = 0.5, add = TRUE)
-}
-
-mf_title(title)
-
-if (scale == TRUE){
-  mf_scale(size = 20, pos = "bottomright", lwd = 1.2, cex = 1, col = "#383838", unit = "km")
-}
-
+  if (basemap == TRUE){
+    mf_shadow(x = communes, col = "grey50", cex = 1, add = TRUE)
+    mf_map(communes, col ="#CCCCCC", border = "white", lwd = 0.5, add = TRUE)
+  }
+  
+  mf_title(title)
+  
+  if (scale == TRUE){
+    mf_scale(size = 20, pos = "bottomright", lwd = 1.2, cex = 1, col = "#383838", unit = "km")
+  }
+  
   mf_credits(
     txt = credits,
     pos = "bottomleft",
@@ -94,13 +94,22 @@ if (scale == TRUE){
     font = 3,
     bg = "#ffffff30"
   )
-}
+  
+if(note != ""){
+  mf_annotation(
+    x = c(885000, 6435000),
+    txt = note,
+    pos = "bottomleft", cex = 1.2, font = 2,
+    halo = TRUE, s = 1.5
+)
+  }
 
+}
 
 ```
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results ="hide"}
-template("Template cartographique", "maps/template.png")
+template("Template cartographique", "maps/template.png", note = "Département de\nl'Isère (38)")
 mf_map(communes, col = col, border = "white", lwd = 0.5, add = TRUE)
 dev.off()
 ```
@@ -144,12 +153,56 @@ return (circles)
 ```{r dotdensitymap, eval = TRUE, message = FALSE, warning = FALSE, results ="hide"}
 onedot = 500
 dots = dotdensitymap(x = communes, var = "pop2018", onedot = onedot, radius = 300)
-template(paste0("Un point = ",onedot," habitants"), "maps/dotdensity.png")
+template("Carte par points", "maps/dotdensity.png", note = paste0("Un point =\n",onedot," habitants"))
 mf_map(dots, col = col, border = "#520a2c", lwd = 0.5, add = TRUE)
 dev.off()
 ```
 
 <img src = "maps/dotdensity.png"></img>
+
+## Simili Points Bertin
+
+```{r Bertin, eval = TRUE, message = FALSE, warning = FALSE, results ="hide"}
+if(!file.exists("files/grid.gpkg")){
+  
+  grid = st_make_grid(communes, cellsize = 1000, square = TRUE)
+  grid = st_sf(id = c(1:length(grid)), geometry = grid)
+  ids = communes[,"id"] %>% st_drop_geometry()
+  ctr = st_centroid(grid)
+
+  for(i in 1:nrow(grid)){
+  x = st_within(x = ctr[i,], y = communes, sparse = TRUE, prepared = TRUE)
+  id = ids[unlist(x),][1]
+  if (length(id) == 0){id = NA}
+  grid[i,"id"] = id
+}
+
+grid <- grid[!is.na(grid$id),]
+
+for(i in 1:nrow(grid)){
+  id = as.character(grid[i,"id"])[1]
+  popAll = as.numeric(communes[communes$id == id,"pop2018"] %>% st_drop_geometry())
+  count = nrow(grid[grid$id == id,])
+  grid[i,"pop"] = popAll / count
+}  
+
+st_write(grid,"files/grid.gpkg", delete_layer=TRUE)
+} else {
+  grid = st_read("files/grid.gpkg")
+}
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results ="hide"}
+template("Points Bertin (grosso modo)", "maps/pointsbertin.png")
+mf_map(communes, col = "#CCCCCC", border = "white", lwd = 0.5, add = FALSE)
+mf_map(grid, var = "pop", col = col, border = "#520a2c", type = "prop",
+       inches = 0.07, leg_title_cex = 1.2, leg_val_cex	= 0.8,
+       leg_title = "Nombre d'habitants, 2018")
+
+dev.off()
+```
+
+<img src = "maps/pointsbertin.png"></img>
 
 # packcircles
 
@@ -440,9 +493,9 @@ dc = dotcartogram(x = communes, var = "pop2018", itermax = 120,
 ```
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-template(paste0("Un point = ",onedot," personnes"), "maps/dotcartogram.png", scale = FALSE)
+template("Dots Cartogram", "maps/dotcartogram.png", note = paste0("Un point =\n",onedot," personnes"), scale = FALSE)
 mf_map(isere, col = "#CCCCCC", border = "white", lwd = 0.5, add = TRUE)
-mf_map(dc, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
+mf_map(dc, col = col, border = "#6b4266", lwd = 0.8, add = TRUE)
 dev.off()
 ```
 
@@ -450,7 +503,54 @@ dev.off()
 
 ## Anti Cartogramme
 
-## Hexbin...
+[@poncet2011antigeographie]
+
+## Hex Cartogram
+
+Ici, on essaye de reproduire les cartogrammes hexagonaux en trichant un peu....
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+cartogram = st_read("files/GastnerSeguy.gpkg")
+```
+
+```{r gridcartogram, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+grid = st_make_grid(cartogram, cellsize = 2000, square = FALSE)
+grid = st_sf(id = rep("",length(grid)), geometry = grid)
+ctr = st_centroid(grid)
+ids = cartogram[,"id"] %>% st_drop_geometry()
+
+for(i in 1:nrow(grid)){
+  x = st_within(x = ctr[i,], y = cartogram, sparse = TRUE, prepared = TRUE)
+  id = ids[unlist(x),][1]
+  if (length(id) == 0){id = NA}
+  grid[i,"id"] = id
+}
+grid <- grid[!is.na(grid$id),]
+
+gridcartogram <- aggregate(x = grid, 
+               by = list(grid$id),
+               FUN = min)
+```
+
+Estimation de la valeur de chaque hexagone
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+varmax = sum(cartogram$pop2018)
+nbcell = nrow(grid)
+valcell = round(varmax / nbcell)
+```
+
+Création de la carte
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+template("Template cartographique", "maps/hexcartogram.png", note = paste0("Un hexagone ≈\n",valcell," habitants"),basemap = FALSE, scale = FALSE)
+mf_shadow(x = grid, col = "grey50", cex = 1, add = TRUE)
+mf_map(grid, col = col, border = "white", lwd = 0.5, add = TRUE)
+mf_map(gridcartogram, col = NA, border = "#6b4266", lwd = 1, add = TRUE)
+dev.off()
+```
+
+<img src = "maps/hexcartogram.png"></img>
 
 # A vous de jouer
 
