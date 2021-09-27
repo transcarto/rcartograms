@@ -624,6 +624,7 @@ rec_cartogram <- data.frame (x= df_recmap$x,
 S'il résoud la question de la variation de taille en implantation surfacique, le cartogramme permet également de "corriger" le fond de carte chroplèthe lorsque l'on cartographe des phénomènes socio-démographiques (cartographie électorale, données insee, de santé...).
 
 Il suffit d'appeler lors de la cartographie de la variable attributaire le fond transformé.
+A priori, le fond transformé correspond à la valeur du dénominateur du taux cartographié (le nombre d'inscrits sur les listes électorales pour cartographier le taux d'abstention, la population active pour un taux de chômage, etc.). Néanmoins lors d'étude sur plusieurs variables socio-démo, on se base souvent sur un fond unique de référence (en général la population résidentielle).
 
 Exemple cartographie de la part de cadres et d'ouvriers
 
@@ -649,9 +650,8 @@ Dorling = cartogram_dorling(communes, "pop2018", k = 1.8)
 
 **Cartographies**
 
-
-
-Comparaison entre différents fonds de carte pour le taux de cadres : géographique, cartogramme continu, discontinu ou de Dorling
+Carte choroplèthe = quel fond de carte choisir pour représenter un taux ?
+géographique, cartogramme continu, discontinu ou de Dorling
 
 Pour les ouvriers
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
@@ -673,24 +673,15 @@ mf_map(x=communes, col=NA)
 mf_map(x=Olson,var = "cadr_tx", type = "choro", pal=cols, breaks = bks, add = TRUE)
 ```
 
-Comparaison cadres-ouvriers
+Comparaison cadres-ouvriers sur fond transformé (peut-être faut faire versus fond géo)
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 par(mfrow = c(1, 2), mar = c(0,0,0,0))
 mf_map(x=Dougenik,var = "cadr_tx", type = "choro", pal=cols, breaks = bks)
 mf_map(x=Dougenik,var = "ouvr_tx", type = "choro", pal=cols, breaks = bks)
 ```
 
-Versus comparaison par la forme qui reproduit en général la répartition de la population lorsque l'on est sur des données démographiques
+Versus comparaison par la forme qui reproduit en général la répartition de la population lorsque l'on est sur des données démographiques. = cartogramme directement sur les effectifs.
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-communes$cadr <- round(communes$cadr)
-communes$ouvr <- round(communes$ouvr)
-doug_cadr <- cartogram_cont(communes, "cadr")
-doug_ouvr <- cartogram_cont(communes, "ouvr")
-par(mfrow = c(1, 2), mar = c(0,0,0,0))
-mf_map(doug_cadr)
-mf_map(doug_ouvr)
-```
 
 # Changement d'échelle !
 
