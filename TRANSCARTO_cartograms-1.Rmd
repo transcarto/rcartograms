@@ -11,9 +11,9 @@ link_citations: true
 
 **Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.**
 
-# Premières étapes
+# Préalables
 
-## Packages
+## Installation des packages
 
 installer les packages suivants ..... + version min
 
@@ -49,11 +49,13 @@ isere = st_union(communes)
 knitr::kable(communes[c(0:10),], row.names = F, digits = 1)
 ```
 
-# Exploration des représentations par packages
+# Exploration des représentations par packages : les classiques
 
-## Rappel en carto "classique" : mapsf
+Rappel : il s'agit ici de résoudre la question de la représentation de quantités brutes associées à des surfaces.
 
-**Le package [mapsf](https://riatelab.github.io/mapsf/) permet de faire des cartes thématiques dans R. C'est le package qui succède au package **cartography**.**
+## Rappel en carto "classique" avec le package mapsf
+
+**Le package [mapsf](https://riatelab.github.io/mapsf/)** permet de faire des cartes thématiques dans R. C'est le package qui succède au package **cartography**.
 
 Trois solutions existent pour cartographier des quantités brutes associées à des surfaces en cartographie dite "classique" : la dot map, les points valués et les symboles proportionnels.
 
@@ -123,7 +125,7 @@ dev.off()
 ```
 <img src = "maps/template.png"></img>
 
-### Dot density maps
+### Dot density map ou carte par points
 
 Il existe plusieurs solutions pour réaliser une carte par point dans R. Ici, nous vous proposeons de créer la fonction pour l'exécuter et cartographier le résultat.
 
@@ -147,7 +149,7 @@ dev.off()
 
 <img src = "maps/dotdensity.png"></img>
 
-### Simili Points Bertin
+### Simili Points Bertin ou points valués
 
 Les points valués, appelés également "points Bertin" sont une variante de la dot map,
 avec deux-trois taille de points de référence pour s'adapter à de fortes disparités
@@ -223,11 +225,11 @@ dev.off()
 <img src = "maps/prop.png"></img>
 
 
-##  Déplacer des disques : vers le cartogramme de Dorling avec packcircles
+##  Le cartogramme circulaire de Dorling avec le package packcircles
 
 **Le package [packcirles](https://github.com/mbedward/packcircles) propose 3 algorithmes simples pour déplacer des disques sur un plan 2D de telle sorte qu'ils ne se supperposent pas. Nous pouvons l'utiliser pour créer des cartogrammes de Dorling [@dorling1996area].**
 
-Création d'un ficher de données simplifié avec les coordonnées des centroides des communes.
+Création d'un ficher de données simplifié avec les coordonnées des centroïdes des communes.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 dots = communes
@@ -271,7 +273,7 @@ dev.off()
 
 ## Les 3 formes classiques avec le package cartogram
 
-**le package [cartogram](https://github.com/sjewo/cartogram) est développé par Sebastian Jeworutzki. Il propose trois méthodes : Dorling, Olson et Dougenik
+**le package [cartogram](https://github.com/sjewo/cartogram)** est développé par Sebastian Jeworutzki. Il propose trois méthodes, de la plus récente à la plus ancienne (XX VALIDER XX) : le cartogramme **circulaire**  de Dorling, continu de Dougenik, Chrisman et Niemeyer et **discontinu** d'Olson).
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 library(cartogram)
@@ -282,39 +284,39 @@ library(cartogram)
 Proche d'un traitement graphique de l'information (le bubble chart), l'algorithme de Danny Dorling permet de visualiser les grandes masses de population en prenant en compte les positions relatives des entités les unes par rapport aux autres.
 
 ```{r Dorling1, eval = TRUE, message = FALSE, warning = FALSE}
-dorling = cartogram_dorling(communes, "pop2018", k = 1.8)
+Dorling = cartogram_dorling(communes, "pop2018", k = 1.8)
 ```
 
 ```{r Dorling2, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 template("Dorling (cartogram)", "maps/dorling2.png", scale = FALSE)
 mf_map(isere, col = "#CCCCCC", border = "white", lwd = 0.5, add = TRUE)
-mf_map(dorling, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
+mf_map(Dorling, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
 dev.off()
 ```
 
 <img src = "maps/dorling2.png"></img>
 
-## Le cartogramme discontinu d'Olson
+### Le cartogramme discontinu d'Olson
 
-Judith Olson, en réaction aux premiers cartogrammes continus de Tobler et notamment les probèmes de lisibilité, propose une variation proportionnelle de la surface tout en gardant sa forme "géographique" [@olson1976noncontiguous]
+Judith Olson, en réaction aux premiers cartogrammes continus de Tobler et notamment les problèmes de lisibilité, propose une variation proportionnelle de la surface tout en gardant sa forme "géographique" [@olson1976noncontiguous]
 
 x	: un objet sf
 weight : nom de la variable
-k : facteur pour augmenter la taille des polygons
-inplace	: Si VRAI, chaque polygone est modifié à sa place initiale, si FAUX, les multi-polygones sont centrés sur leur centroïde initial
+k : facteur pour augmenter la taille des polygones
+inplace	: Si VRAI, chaque polygone est modifié ???? à sa place initiale, si FAUX, les multi-polygones sont centrés sur leur centroïde initial.
 
-```{r Olsen1, eval = TRUE, message = FALSE, warning = FALSE}
-olsen <- cartogram_ncont(communes, "pop2018", k = 1, inplace = TRUE)
+```{r Olson1, eval = TRUE, message = FALSE, warning = FALSE}
+Olson <- cartogram_ncont(communes, "pop2018", k = 1, inplace = TRUE)
 ```
 
-```{r Olsen2, eval=TRUE, message=FALSE, warning=FALSE, results=}
-template("Olsen (cartogram)", "maps/olsen.png", basemap = FALSE, scale = FALSE)
+```{r Olson2, eval=TRUE, message=FALSE, warning=FALSE, results=FALSE}
+template("Olson (cartogram)", "maps/olson.png", basemap = FALSE, scale = FALSE)
 mf_map(isere, col = "#CCCCCC30", border = "white", lwd = 0.5, add = TRUE)
-mf_map(olsen, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
+mf_map(Olson, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
 dev.off()
 ```
 
-<img src = "maps/olsen.png"></img>
+<img src = "maps/olson.png"></img>
 
 ### Le cartogramme continu Dougenik
 
@@ -352,13 +354,15 @@ dev.off()
 
 <img src = "maps/dougenik.png"></img>
 
-# Les equal density cartogram de Gastner et al. avec cartogramR
+## Les algos pour les cartogrammes continus avec le package cartogramR
+
+XXX JE fais l'install.packages il compile a library il m'explique qu'elle n'existe pas ...
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 library(cartogramR)
 ```
 
-Le package cartogramR est déveoppé par Pierre-Andre Cornillon et Florent Demoraes de l'université de Rennes. Le package propose les méthodes *flow based cartogram* [@gastner2004diffusion] implanté dans Scapetoad, *fast flow based cartogram* [@gastner2018fast] et *rubber band based cartogram* [@dougenik1985algorithm]. La méthode flow based cartogram est basée sur [go_cart](https://github.com/Flow-Based-Cartograms/go_cart).
+Le package cartogramR est développé par Pierre-Andre Cornillon et Florent Demoraes de l'université de Rennes. Le package propose les méthodes *flow based cartogram* [@gastner2004diffusion] implanté dans Scapetoad, *fast flow based cartogram* [@gastner2018fast] et *rubber band based cartogram* [@dougenik1985algorithm]. La méthode flow based cartogram est basée sur [go_cart](https://github.com/Flow-Based-Cartograms/go_cart).
 
 Attention, cartogramR n'est pas/plus sur le CRAN. L'archive est néanmoins disponible et permet l'installation. 
 
@@ -372,6 +376,10 @@ summary(precarto)
 
 la fonction *cartogramR()* permet de calculer le cartogramme en tant que tel selon les 3 méthodes proposées : GastnerSeguyMore" (ou "gsm), "GastnerNewman" (ou "gn), "DougenikChrismanNiemeyer" (ou "dcn"). L'option *L=256* permet de choisir la taille de la grille. L'option *grid=TRUE* (pour les méthodes "gsm" et "gn") permet d'afficher la grille de déformation. L'option *maxit=50* permet de définir le nombre d'itérations max (défaut = 50).
 
+Test de l'algorithme de Gastener et Newman de 2004, équivalent à celui implanté dans la solution java scapetoad.
+
+xxxx Je ne sais pas si Dominique a testé Isere sur Scapetoad xxxxxx
+
 ```{r cartogramR, eval = TRUE, message = FALSE, warning = FALSE}
 GastnerSeguy <- cartogramR(communes, count="pop2018", method="GastnerSeguyMore", options=list(L=256, grid=TRUE, maxit = 5))
 ```
@@ -382,7 +390,7 @@ La fonction *make_layer()* permet de récupérer la grille de calcul  (mais auss
 grid <- make_layer(GastnerSeguy, type = c("final_graticule"))
 ```
 
-Ensuite, il est très facile d'afficher le cartogram avec plot (via *sf*) ou comme précédemment, avec le package *mapsf*.
+L'affichage des résultats peut se réaliser avec plot (via *sf*) ou, comme précédemment, avec le package *mapsf*.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 template("Gastner, Seguy & More", "maps/gastnerseguy.png", basemap = FALSE, scale = FALSE)
@@ -390,6 +398,8 @@ mf_map(GastnerSeguy$cartogram, col = col, border = "white", lwd = 1, add = TRUE)
 mf_map(grid, col = NA, border = "#6b4266", lwd = 0.05, add = TRUE)
 dev.off()
 ```
+
+XXXX acb (message pour moi-même ou Nico) voir si on peut arriver à l'équivalent scapetoad = afficher la légende, les erreurs, la grille. La légende serait un vrai plus) xxxx
 
 <img src = "maps/gastnerseguy.png"></img>
 
@@ -412,7 +422,7 @@ st_write(as.sf(GastnerSeguy),"files/GastnerSeguy.gpkg", delete_layer=TRUE)
 # st_write(GastnerSeguy_sf,"files/GastnerSeguy.gpkg", delete_layer=TRUE)
 ```
 
-# Bonus : de multiples formes pour augmenter les points de vues
+# Variations : encore plus de cartogrammes
 
 ## Dots Cartograms
 
@@ -466,18 +476,16 @@ dev.off()
 
 <img src = "maps/dotcartogram.png"></img>
 
-## Anti Cartogramme
-Eduardo Dutenkefer a exploré l'esthétique des cartogrammes et notamment imaginé l'anti-cartogram, qui inverse les poids des entités : la surface varie inversement proprtionnellement à la valeur cartographiée. XXXXX comment on dit ça ????"
-[@poncet2011antigeographie]
+## Mosaic cartogram
 
-## Hex Cartogram
+Ici, on essaie de reproduire les cartogrammes de type mosaïque en trichant un peu... La forme choisie est l'hexagone. On est sur un *hexagonal cartogram*.
 
-Ici, on essaye de reproduire les cartogrammes hexagonaux en trichant un peu....
-
+On récupère un fond transformé par un algorithme de cartogramme continu
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 cartogram = st_read("files/GastnerSeguy.gpkg")
 ```
 
+Création d'une grille hexagonale, récupération des identificateurs des entités
 ```{r gridcartogram, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 grid = st_make_grid(cartogram, cellsize = 2000, square = FALSE)
 grid = st_sf(id = rep("",length(grid)), geometry = grid)
@@ -517,9 +525,182 @@ dev.off()
 
 <img src = "maps/hexcartogram.png"></img>
 
-# A vous de jouer
 
-Explorez les cartogrammes à l'échelle mondiale.
+Tu peux ajouter fastoche une petite mesure de la qualité.
+
+the quality of the representation = scatterplot that related the number of hexagons per distorted region with the total population of the respective region + The coefficient of correlation, R2.
+ 
+
+
+https://www.ralphstraumann.ch/blog/2013/05/creating-a-hexagonal-cartogram/
+
+
+## Hybride : tessalation et cartograme continu
+
+A vous de jouer !
+Quel package pour créer une tesselation de la zone d'étude ?
+Fichier entrée : les centroïdes extrait des entités surfacique et le contour de la zone pour la découpe. 
+Le fond Voronoi peut ensuite être transformé par l'un des alorithme qui crée le cartogramme continu
+
+## L'impossibilité de réaliser un cartogramme rectangulaire avec le package recMap
+
+A ce jour, il n'est pas possible d'automatiser la réalisation de cartogrammes de Demers ou rectangulaire, qui puissent construire et assembler un puzzle respectant surface, contiguité tout en recréant une forme globale à partir de formes carrées ou rectangulaires proportionnelles à des quantités brutes (stock).
+
+Christian Panse a développé une première approche algorithmique que l'on trouve dans le package **Recmap** [@heilmann2004recmap] [@panse2016rectangular]. L'algorithme va convertir les géométries des unités spatiales en rectangles dont la surface est définie par la variable thématique (stock). L'algorithme de RecMap est disponible [ici](https://ieeexplore.ieee.org/document/1382888). Développé en C++11, le package dépend des packages GA (>= 3.1), Rcpp (>= 1.0), sp(>= 1.3)
+
+Nico, je me suis permise, comme c'est un nouveau fichier, de remplacer par l'exemple de l'Isère pour qu'on reste sur la même zone. Qu'en pense-tu
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+library(recmap)
+```
+**Préparation des données**
+
+
+Création d'une fonction pour créer un fichier conforme à recmap
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+sfc_as_cols <- function(x, geometry, names = c("x","y")) {
+  if (missing(geometry)) {
+    geometry <- sf::st_geometry(x)
+  } else {
+    geometry <- rlang::eval_tidy(enquo(geometry), x)
+  }
+  stopifnot(inherits(x,"sf") && inherits(geometry,"sfc_POINT"))
+  ret <- sf::st_coordinates(geometry)
+  ret <- tibble::as_tibble(ret)
+  stopifnot(length(names) == ncol(ret))
+  x <- x[ , !names(x) %in% names]
+  ret <- setNames(ret,names)
+  dplyr::bind_cols(x,ret)
+}
+```
+
+
+Extraction des centroïdes long-lat sous forme d'une table XY
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+coords <- st_centroid(communes)
+coords <- st_transform(coords, crs="+proj=longlat +datum=WGS84 +ellps=WGS84")
+```
+
+
+Création du fichier pour recmap
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+df_recmap <- sfc_as_cols(coords)
+```
+
+
+Calcul des rectangles
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+rec_cartogram <- data.frame (x= df_recmap$x,
+                             y=df_recmap$y,
+                             # make the rectangles overlapping by correcting lines of longitude distance
+                             dx = sqrt(df_recmap$pop2018) / 90 / abs((0.65 * 60 * cos(df_recmap$y*pi/180))),
+                             dy = sqrt(df_recmap$pop2018) / 90 / (0.65 * 60),
+                             z = sqrt(df_recmap$pop2018),
+                             name = df_recmap$id)
+```
+
+@Nico Il faut que tu revoies le code pour l'affichage template je capte pas comment ça marche ce truc
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+# template("", "maps/recmap1.png", basemap = FALSE, scale = FALSE)
+# plot.recmap(df, col = NA, border = col, lwd=4,  col.text = col)
+# dev.off()
+```
+
+<img src = "maps/recmap1.png"></img>
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+#cartog <- recmap(df)
+#template("", "maps/recmap2.png", basemap = FALSE, scale = FALSE)
+#plot(cartog[!cartog$name %in% c("IS","MT"),],  col = col, border = "white")
+#dev.off()
+```
+
+<img src = "maps/recmap2.png"></img>
+
+
+
+# Le cartogramme comme système de projection
+
+S'il résoud la question de la variation de taille en implantation surfacique, le cartogramme permet également de "corriger" le fond de carte chroplèthe lorsque l'on cartographe des phénomènes socio-démographiques (cartographie électorale, données insee, de santé...).
+
+Il suffit d'appeler lors de la cartographie de la variable attributaire le fond transformé.
+
+Exemple cartographie de la part de cadres et d'ouvriers
+
+Du coup là on verra pour les variables qu'on propose, juste faire gaffe d'avoir le bon dénominateur pour le calcul du taux, cf.  population 18-65 pour calculer un taux à partir de csp.
+
+Comparaison taux de cadres et ouvriers
+
+Calcul des taux et discrétisation
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+communes$ouvr_tx <- communes$ouvr/communes$pop2018*100
+communes$cadr_tx <- communes$cadr/communes$pop2018*100
+bks <- c(0,0.5,5,10,15,20,25,100)
+cols <- c("#ffffff","#e5f5f9","#ccece6","#66c2a4","#238b45","#006d2c","#00441b")
+```
+71% de cadres à Oulles, 6 habitants ;-)
+
+Calcul des fonds de carte
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+Dougenik <- cartogram_cont(communes, "pop2018", prepare = "none", itermax = 10, maxSizeError = 1.15)
+Olson <- cartogram_ncont(communes, "pop2018", k = 1, inplace = TRUE)
+Dorling = cartogram_dorling(communes, "pop2018", k = 1.8)
+```
+
+**Cartographies**
+
+
+
+Comparaison entre différents fonds de carte pour le taux de cadres : géographique, cartogramme continu, discontinu ou de Dorling
+
+Pour les ouvriers
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+par(mfrow = c(2, 2), mar = c(0,0,0,0))
+mf_map(x=communes,var = "ouvr_tx", type = "choro", pal = cols, breaks = bks)
+mf_map(x=Dougenik,var = "ouvr_tx", type = "choro", pal=cols, breaks = bks)
+mf_map(x=Dorling,var = "ouvr_tx", type = "choro",  pal=cols, breaks = bks)
+mf_map(x=communes, col=NA)
+mf_map(x=Olson,var = "ouvr_tx", type = "choro", pal=cols, breaks = bks, add = TRUE)
+```
+
+Pour les cadres
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+par(mfrow = c(2, 2), mar = c(0,0,0,0))
+mf_map(x=communes,var = "cadr_tx", type = "choro", pal = cols, breaks = bks)
+mf_map(x=Dougenik,var = "cadr_tx", type = "choro", pal=cols, breaks = bks)
+mf_map(x=Dorling,var = "cadr_tx", type = "choro",  pal=cols, breaks = bks)
+mf_map(x=communes, col=NA)
+mf_map(x=Olson,var = "cadr_tx", type = "choro", pal=cols, breaks = bks, add = TRUE)
+```
+
+Comparaison cadres-ouvriers
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+par(mfrow = c(1, 2), mar = c(0,0,0,0))
+mf_map(x=Dougenik,var = "cadr_tx", type = "choro", pal=cols, breaks = bks)
+mf_map(x=Dougenik,var = "ouvr_tx", type = "choro", pal=cols, breaks = bks)
+```
+
+Versus comparaison par la forme qui reproduit en général la répartition de la population lorsque l'on est sur des données démographiques
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+communes$cadr <- round(communes$cadr)
+communes$ouvr <- round(communes$ouvr)
+doug_cadr <- cartogram_cont(communes, "cadr")
+doug_ouvr <- cartogram_cont(communes, "ouvr")
+par(mfrow = c(1, 2), mar = c(0,0,0,0))
+mf_map(doug_cadr)
+mf_map(doug_ouvr)
+```
+
+# Changement d'échelle !
+
+Cartogramme et échelle spatiale sont fondamentalement liés. La lecture de toute carte, comme du cartogramme est plus ou moins liée à la familiarité avec l'espace représenté. Dans le cas du cartogramme, l'étendue de l'espace cartographié, le niveaux d'agrégation et la méthode choisie permettent de chercher une solution adaptée au phénomène à représenter. Le cartogramme rectangulaire ou de Demers est probablement plus adaptés lorsque le nombre d'entité à cartographier est limité, alors que les cercles de Dorling s'adaptent à toute situation.
+
+## Cartogramme et étendue spatiale
+
+### Explorez les cartogrammes à l'échelle mondiale
+
+Quel fond de carte pour la représentation du monde ?
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 world <- st_read("data/world_countries.geojson", quiet = TRUE ) %>%
@@ -532,7 +713,7 @@ world <- world[world$ISO3 != "ATA",]
 knitr::kable(world[c(0:10),], row.names = F, digits = 1)
 ```
 
-Votre template cartographique
+Un premier point de vue sur le monde (prjection Bertin, par Fil)
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 col = "#c291bc"
@@ -577,66 +758,85 @@ dev.off()
 
 <img src = "maps/world.png"></img>
 
-
-
-# RecMap
-
-
-Recmap [@heilmann2004recmap] [@panse2016rectangular] est un package développé par Christian Panse. Il perlet de concertir les géométries des unités spatiales en rectangles dont la surace est définie en fonction d'une donnée statitique sauntitative absolue. L'algorithe de RecMap est disponible [ici](https://ieeexplore.ieee.org/document/1382888). Développé en C++11, le package dépend des packages GA (>= 3.1), Rcpp (>= 1.0), sp(>= 1.3)
-
-Attention, il ne fonctionne que sur un nombre limité d'unités territoriales. Et même dans ce cas, il ne fonctionne pas très bien, notamment avec les petites unités spatiales. 
+Lorsque l'on travaille avec les cartogrammes, les messages d'erreurs les plus courants sont liés à des valeurs absentes, des polygones mal fermés ou des contiguités imparfaites.
+Cela se discute, mais on peut considérer qu'il est plus "propre" de supprimer les entités avec des valeurs absentes ou nulles du jeu de données : en effet, elles ne sont pas concernées par le phénomène représenté.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-library(recmap)
+world_sansNA = na.omit(world)
 ```
 
-Ici un exemple sur les pays d'Europe.
+Les formes du monde (le fond de carte en question)
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+par(mfrow = c(2, 2), mar = c(0,0,0,0))
+mf_map(world_sansNA)
+mf_map(x=cartogram_cont(world_sansNA, "PopTotal"))
+mf_map(x=cartogram_dorling(world_sansNA, "PopTotal"))
+mf_map(x=cartogram_ncont(world_sansNA, "PopTotal"))
+dev.off()
+```
+
+### Explorez les cartogrammes à l'échelle européenne
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 europe <- st_read("data/europe.geojson")
 ```
 
-Préparation des données
-
+Les formes du monde (le fond de carte en question)
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-coords = data.frame(st_coordinates(st_centroid(st_geometry(europe))))
-bb <- lapply(st_geometry(europe), function(x){st_bbox(x)})
-dx <- unlist(lapply(bb, function(x){x[3]-x[1]})) / 2
-dy <- unlist(lapply(bb, function(x){x[4]-x[2]})) / 2
-
-df <- data.frame(x = coords$X, 
-                 y = coords$Y, 
-                 dx = dx, 
-                 dy = dy, 
-                 z = europe$pop2008,
-                 name = europe$id)
+par(mfrow = c(2, 2), mar = c(0,0,0,0))
+mf_map(europe)
+mf_map(x=cartogram_cont(europe, "pop2008"))
+mf_map(x=cartogram_dorling(europe, "pop2008"))
+mf_map(x=cartogram_ncont(europe, "pop2008"))
+dev.off()
 ```
 
+
+
+## Cartogramme et niveaux d'agrégation
+
+Reprendre l'Isère (communes, cantons, arrondissement) et l'Europe
+
+J'ai vu que tu as préparé un fond Europe pays - est-ce que éventuellement tu as le pendant en nuts 2 et nuts 1 ?
+Sinon j'en ai
+
+
+# A vous de jouer...
+
+Et pour pour les afficionados de R, quelques pistes à creuser :
+* travailler l'habillage de la carte : comment automatiser l'ajout d'une légende (surface de référence)
+* améliorer la qualité du cartogramme continu (cf. mesure d'erreur) : repasser l'algorithme sur le fond transformé se heurte souvent à des erreurs de topologie créées par la transformation. Ceci nécessite de passer l'équivalent du "réparer les topologies" de QGIS sur les fonds transformés (opération a éventuellement effectuer par défaut pour un fond plus "propre").
+
+## Un mot sur l'anticartogramme
+
+Eduardo Dutenkefer a exploré l'esthétique des cartogrammes et notamment imaginé l'anti-cartogramme, qui inverse le poids des entités : la surface varie en proportion inverse à la valeur cartographiée.
+
+Rappel. Le cartogramme a pour objectif par la variation de taille, qui  a un sens bien défini en cartographie, basé sur la perception visuelle (la surface permet d'estimer la part de chaque ou d'un groupe d'entités sur le total), de révéler les inégalités de répartition sur un territoire.
+
+Si on s'en tient au traitement cartogramme de la donnée, l'anticartogramme ne sert à rien dans le cadre d'une analyse des inégalités territoriales. Il serait faux de dire que l'anticartogramme représenterait le contraire (excepté dans le cas où deux variables représenterait la part d'un tout : p. ex. les votes exprimés entre deux candidats, chômeurs et actifs dans la population active, situation où nous sommes de facto en présence d'une relation inverse entre les deux variables).
+
+Représenter le non poids des lieux ? Un cartogramme de la non population ne représente pas nécessairement les zones dites rurales. A l'échelle mondiale, l'anti-cartogramme des riches n'est pas le cartogramme des pauvres. Les inégalités de répartition de la non-population, du non-PIB, du non CO2, de la même manière que la visualisation des non flux ou une carte des anti flux, où le flux le plus insignifiant devient le plus massif.  Pour révéler et analyser les zones où les effectifs sont faibles, les stocks peu élevés, le traitement de la donnée s'effectue par le filtrage.
+ 
+Visualiser le "non poids", créer la "non image" d'un espace peut soutenir un discours artistique, métaphorique sur un espace et non pas à cartographier une variable quantitative.
+
+[@poncet2011antigeographie] Je mettrais plutôt la thèse de Dutenkefer ou son article avec Padovesi Fonseca antérieures au topo de Poncet. Si j'avais eu un peu le temps je les aurais contactés car ils auraient sûrement été très intéressés par Transcarto.
+
+
+Calcul de la valeur du "non phénomène" cartographié (1/)
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
-knitr::kable(df[c(0:10),], row.names = F, digits = 1)
+communes$inverse = 1/communes$pop2018
 ```
 
-```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-template("", "maps/recmap1.png", basemap = FALSE, scale = FALSE)
-plot.recmap(df, col = NA, border = col, lwd=4,  col.text = col)
-dev.off()
+
+
+```{r AntiCartogram, eval = TRUE, message = FALSE, warning = FALSE}
+# antiCartogram <- cartogram_cont(communes, "inverse", prepare = "none", itermax = 10, maxSizeError = 1.15)
+# template("AntiCartogram (cartogram)", "maps/anticartogram", basemap = FALSE, scale = FALSE)
+# mf_map(x = antiCartogram, type = "choro",var = "error", border = "#6b4266", lwd = 0.5, add = TRUE)
+# dev.off()
 ```
 
-<img src = "maps/recmap1.png"></img>
-
-```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-cartog <- recmap(df)
-template("", "maps/recmap2.png", basemap = FALSE, scale = FALSE)
-plot(cartog[!cartog$name %in% c("IS","MT"),],  col = col, border = "white")
-dev.off()
-```
-
-NB : IS et MT n'ont pu être placés. On les supprime à l'affichage. 
-
-<img src = "maps/recmap2.png"></img>
 
 
-A vous de jouer...
-
-# Blibliographie
+# Bibliographie
 
