@@ -537,6 +537,40 @@ https://www.ralphstraumann.ch/blog/2013/05/creating-a-hexagonal-cartogram/
 
 ## Hybride : tessalation et cartograme continu
 
+NB : calculer les polygones de voronoi en R est un peu *tricky*. [Voir](https://github.com/r-spatial/sf/issues/474) et [voir](https://stackoverflow.com/questions/45719790/create-voronoi-polygon-with-simple-feature-in-r).
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+c <- st_centroid(communes)
+v <- st_voronoi(x = st_union(c))
+v <- st_intersection(st_cast(v), st_union(communes))
+v <- st_join(x = st_sf(v), y = c, join=st_intersects)
+v <- st_cast(v, "MULTIPOLYGON")
+```
+
+```{r voronoi, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+template("Polygones de voronoi", "maps/voronoi.png", basemap = FALSE, scale = FALSE)
+mf_map(x = v, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
+dev.off()
+```
+
+<img src = "maps/voronoi.png"></img>
+
+Ensuite, on peut calculer un cartogramme de Dougenik sur ces nouvelles géométries.
+
+```{r Dougenikvoronoi, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+VDougenik <- cartogram_cont(v, "pop2018", prepare = "none", itermax = 15, maxSizeError = 1.15)
+```
+
+```{r Dougenikvoronoi2, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
+template("Dougenik & voronoi", "maps/dvoronoi.png", basemap = FALSE, scale = FALSE)
+mf_map(x = VDougenik, col = col, border = "#6b4266", lwd = 0.5, add = TRUE)
+dev.off()
+```
+
+
+<img src = "maps/dvoronoi.png"></img>
+
+
 A vous de jouer !
 Quel package pour créer une tesselation de la zone d'étude ?
 Fichier entrée : les centroïdes extrait des entités surfacique et le contour de la zone pour la découpe. 
@@ -601,23 +635,21 @@ rec_cartogram <- data.frame (x= df_recmap$x,
 
 @Nico Il faut que tu revoies le code pour l'affichage template je capte pas comment ça marche ce truc
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-# template("", "maps/recmap1.png", basemap = FALSE, scale = FALSE)
-# plot.recmap(df, col = NA, border = col, lwd=4,  col.text = col)
-# dev.off()
+template("RecMap", "maps/recmap1.png", basemap = FALSE, scale = FALSE)
+plot.recmap(df, col = NA, border = col, lwd=4,  col.text = col)
+dev.off()
 ```
 
 <img src = "maps/recmap1.png"></img>
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-#cartog <- recmap(df)
-#template("", "maps/recmap2.png", basemap = FALSE, scale = FALSE)
-#plot(cartog[!cartog$name %in% c("IS","MT"),],  col = col, border = "white")
-#dev.off()
+cartog <- recmap(df)
+template("RecMap", "maps/recmap2.png", basemap = FALSE, scale = FALSE)
+plot(cartog[!cartog$name %in% c("IS","MT"),],  col = col, border = "white")
+dev.off()
 ```
 
 <img src = "maps/recmap2.png"></img>
-
-
 
 # Le cartogramme comme système de projection
 

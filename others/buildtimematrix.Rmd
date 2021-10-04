@@ -1,0 +1,23 @@
+---
+title: "Créer une matrice de distance"
+author: "LAMBERT N."
+date: "2021"
+output:
+  rmdformats::readthedown
+link_citations: true
+  
+---
+
+**Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.**
+
+<div id="observablehq-map-3781e6bf"></div>
+
+<script type="module">
+import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
+import define from "https://api.observablehq.com/@neocartocnrs/paris-by-road-osrm.js?v=3";
+new Runtime().module(define, name => {
+  if (name === "map") return new Inspector(document.querySelector("#observablehq-map-3781e6bf"));
+});
+</script>
+
+> https://observablehq.com/@neocartocnrs/paris-by-road-osrm

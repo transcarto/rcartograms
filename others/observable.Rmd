@@ -1,0 +1,48 @@
+---
+title: "Observable"
+author: "LAMBERT N."
+date: "2021"
+output:
+  rmdformats::readthedown
+link_citations: true
+  
+---
+
+
+# Dougenik
+
+> https://observablehq.com/@ambassadors/lets-make-a-dougenik-cartogram
+
+> https://observablehq.com/@ambassadors/hello-topogram
+
+# Dorling
+
+> https://observablehq.com/@neocartocnrs/dorling-cartogram
+
+> https://observablehq.com/@neocartocnrs/black-lives-matter-in-the-mediterranean
+
+# Demers
+
+> https://observablehq.com/@neocartocnrs/dorling-vs-demers
+
+# RecMap
+
+> https://observablehq.com/@neocartocnrs/rectangle-cartogram
+
+# Olson
+
+> https://observablehq.com/@d3/non-contiguous-cartogram
+
+> https://observablehq.com/@neocartocnrs/impact-of-projections-on-areas
+
+# Dots Cartogram
+
+> https://observablehq.com/d/23eaf5593be0ed2f
+
+# FishEye
+
+> https://observablehq.com/@toja/magnifying-glass-projections
+
+> https://observablehq.com/@duaneatat/smoothed-fisheye
+
+> https://observablehq.com/@fil/fisheye-globe
