@@ -1,0 +1,15 @@
+---
+title: "test-acb-push-pull"
+author: "acb"
+date: "04/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Test pour voir si je peux synchroniser
+
+alors alors est-ce que ça va marcher
+
