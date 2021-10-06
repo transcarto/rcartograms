@@ -10,6 +10,8 @@ link_citations: true
 
 # L'API OSRM
 
+Il est possible d'attaquer n'importe quelle API en utilisant le package *RCurl* qui permet d'envoyer des requetes http://... 
+
 > https://neocarto.github.io/rspatial/osrm/osrm.html
 
 # Le package osrm
@@ -65,16 +67,6 @@ mytrip <- trips[[1]]$trip
 plot(st_geometry(mytrip), col = "black", lwd = 4)
 plot(st_geometry(mytrip), col = c("red", "white"), lwd = 1, add = TRUE)
 plot(st_geometry(apotheke.sf), pch = 21, bg = "red", cex = 1, add = TRUE)
-```
-
-## osrmIsometric
-
-basé sur *osrmTable*, la fonction *osrmIsometric* permet de construir des polygones d'égales distances par la route.
-
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
-iso <- osrmIsometric(loc = c(13.43,52.47), breaks = c(0,100,200, 500, 1000),
-                     returnclass="sf")
-plot(st_geometry(iso))
 ```
 
 ## osrmIsochrone

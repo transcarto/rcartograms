@@ -13,6 +13,7 @@ link_citations: true
 **Le package fishEye, développé par Timothée Giraud est disponible sur gihub. Il propose 2 méthodes de déformation : log et racine carrée.**
 
 La méthode 'log' transforme les distances au centre de la façon suivante : d' = log(1 + 10^(-k) * d) 
+
 La méthode 'sqrt' transforme les distances au centre de la façon suivante : d' = sqrt(d)
 
 ```{r, eval = FALSE, message = FALSE, warning = FALSE}
