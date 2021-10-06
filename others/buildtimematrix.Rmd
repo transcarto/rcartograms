@@ -8,16 +8,90 @@ link_citations: true
   
 ---
 
-**Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.**
+# L'API OSRM
 
-<div id="observablehq-map-3781e6bf"></div>
+> https://neocarto.github.io/rspatial/osrm/osrm.html
 
-<script type="module">
-import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-import define from "https://api.observablehq.com/@neocartocnrs/paris-by-road-osrm.js?v=3";
-new Runtime().module(define, name => {
-  if (name === "map") return new Inspector(document.querySelector("#observablehq-map-3781e6bf"));
-});
-</script>
+# Le package osrm
+
+Le package *osrm* ets une interface entre R et l'API OSRM. OSRM est un service de routage basé sur les données OpenStreetMap. Ce package permet donc de calculer des itinéraires, des trajets, des isochrones et des matrices de distances de déplacement (temps de trajet et distance kilométrique).
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library(sf)
+library(osrm)
+```
+
+Données du package
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+apotheke.df <- read.csv(system.file("csv/apotheke.csv", package = "osrm"))
+apotheke.sf <- st_read(system.file("gpkg/apotheke.gpkg", package = "osrm"), 
+                       quiet = TRUE)
+```
+
+## osrmTable
+
+*osrmTable* permet d'obtenir des matrices de temps de parcours entre des points. Cette fonction sert d'interface au service *table* d'OSRM.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+# Travel time matrix
+distA <- osrmTable(loc = apotheke.df[1:50, c("id","lon","lat")])
+# First 5 rows and columns
+distA$durations[1:5,1:5]
+```
+
+## osrmRoute
+
+*osrmRoute* permet d'obtenir la géométrie du trajet entre deux points. Cette fonction sert d'interface au service *route* d'OSRM.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+# Travel path between points
+route1 <- osrmRoute(src = apotheke.sf[1, ], dst = apotheke.df[16, ], 
+                    returnclass="sf")
+# Display paths
+plot(st_geometry(route1))
+plot(st_geometry(apotheke.sf[c(1,16),]), col = "red", pch = 20, add = TRUE)
+```
+
+## osrmTrip
+
+*osrmTrip* permet d'obtenir la géométrie du trajet le plus court entre plusieurs points. Cette fonction sert d'interface au service *trip* d'OSRM.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+# Get a trip with a set of points (sf POINT)
+trips <- osrmTrip(loc = apotheke.sf[1:5, ], returnclass = "sf")
+mytrip <- trips[[1]]$trip
+# Display the trip
+plot(st_geometry(mytrip), col = "black", lwd = 4)
+plot(st_geometry(mytrip), col = c("red", "white"), lwd = 1, add = TRUE)
+plot(st_geometry(apotheke.sf), pch = 21, bg = "red", cex = 1, add = TRUE)
+```
+
+## osrmIsometric
+
+basé sur *osrmTable*, la fonction *osrmIsometric* permet de construir des polygones d'égales distances par la route.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+iso <- osrmIsometric(loc = c(13.43,52.47), breaks = c(0,100,200, 500, 1000),
+                     returnclass="sf")
+plot(st_geometry(iso))
+```
+
+## osrmIsochrone
+
+basé sur *osrmTable*, la fonction *osrmIsochrone* permet de construire des isochrones.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+iso <- osrmIsochrone(loc = c(13.43,52.47), breaks = seq(0,14,2),
+                     returnclass="sf")
+plot(st_geometry(iso), col = c('grey80','grey60','grey50',
+                               'grey40','grey30','grey20'))
+```
+
+# Quelques trucs dans Observable
+
+> https://observablehq.com/@neocartocnrs/getting-routes-with-osrm
+
+> https://observablehq.com/@neocartocnrs/iseredistancematrix
 
 > https://observablehq.com/@neocartocnrs/paris-by-road-osrm
