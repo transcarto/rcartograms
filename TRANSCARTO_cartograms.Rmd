@@ -710,26 +710,43 @@ Attention, il ne fonctionne que sur un nombre limité d’unités territoriales.
 Avec un nombre plus réduit d'unités, il est possible de mener le process jusqu'au bout. Essayons sur l'Europe...
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-europe <- st_read("https://raw.githubusercontent.com/transcarto/rcartograms/main/data/europe.json")
+europe <-
+  st_read(
+    "https://raw.githubusercontent.com/transcarto/rcartograms/main/data/europe.geojson"
+  ) %>% st_transform(3035)
 ```
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 coords = data.frame(st_coordinates(st_centroid(st_geometry(europe))))
-bb <- lapply(st_geometry(europe), function(x){st_bbox(x)})
-dx <- unlist(lapply(bb, function(x){x[3]-x[1]})) / 2
-dy <- unlist(lapply(bb, function(x){x[4]-x[2]})) / 2
+bb <- lapply(st_geometry(europe), function(x) {
+  st_bbox(x)
+})
+dx <- unlist(lapply(bb, function(x) {
+  x[3] - x[1]
+})) / 2
+dy <- unlist(lapply(bb, function(x) {
+  x[4] - x[2]
+})) / 2
 
-df <- data.frame(x = coords$X, 
-                 y = coords$Y, 
-                 dx = dx, 
-                 dy = dy, 
-                 z = europe$pop2008,
-                 name = europe$id)
+df <- data.frame(
+  x = coords$X,
+  y = coords$Y,
+  dx = dx,
+  dy = dy,
+  z = europe$pop2008,
+  name = europe$id
+)
 ```
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 template("", "maps/recmap2.png", basemap = FALSE, scale = FALSE)
-plot.recmap(df, col = NA, border = col, lwd=4,  col.text = col)
+plot.recmap(
+  df,
+  col = NA,
+  border = col,
+  lwd = 4,
+  col.text = col
+)
 dev.off()
 ```
 
@@ -738,7 +755,7 @@ dev.off()
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 cartog <- recmap(df)
 template("", "maps/recmap3.png", basemap = FALSE, scale = FALSE)
-plot(cartog[!cartog$name %in% c("IS","MT"),],  col = col, border = "white")
+plot(cartog[!cartog$name %in% c("IS", "MT"),],  col = col, border = "white")
 dev.off()
 ```
 
@@ -761,10 +778,17 @@ Comparaison taux de cadres et ouvriers
 
 Calcul des taux et discrétisation
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-communes$ouvr_tx <- communes$ouvr/communes$pop2018*100
-communes$cadr_tx <- communes$cadr/communes$pop2018*100
-bks <- c(0,0.5,5,10,15,20,25,100)
-cols <- c("#ffffff","#e5f5f9","#ccece6","#66c2a4","#238b45","#006d2c","#00441b")
+communes$ouvr_tx <- communes$ouvr / communes$pop2018 * 100
+communes$cadr_tx <- communes$cadr / communes$pop2018 * 100
+bks <- c(0, 0.5, 5, 10, 15, 20, 25, 100)
+cols <-
+  c("#ffffff",
+    "#e5f5f9",
+    "#ccece6",
+    "#66c2a4",
+    "#238b45",
+    "#006d2c",
+    "#00441b")
 ```
 71% de cadres à Oulles, 6 habitants ;-)
 
