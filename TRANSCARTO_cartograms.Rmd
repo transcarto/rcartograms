@@ -940,7 +940,7 @@ dev.off()
 ### Explorez les cartogrammes à l'échelle européenne
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-europe <- st_read("https://raw.githubusercontent.com/transcarto/rcartograms/main/data/europe.geojson")
+europe <- st_read("https://raw.githubusercontent.com/transcarto/rcartograms/main/data/europe.geojson") %>% st_transform(3035)
 ```
 
 Les formes du monde (le fond de carte en question)
