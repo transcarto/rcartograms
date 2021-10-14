@@ -9,13 +9,13 @@ link_citations: true
   
 ---
 
-**Dans cette séquance, nous proposons d'explorer les différentes méthodes disponibles dans R, pour réaliser des cartogrammes basés sur des données quantitatibes absolues.**
+**Dans cette séquence, nous proposons d'explorer différentes méthodes disponibles dans R, pour réaliser des cartogrammes basés sur des données quantitatives absolues (stocks).**
 
 # Préalables
 
 ## Installation des packages
 
-Voici les liste des packages à installer.
+Voici une liste des packages à installer.
 
 NB : Pour installer le package *cartogramR*, vous aurez besoin d'installer au préalable [FFTW](http://www.fftw.org/). Sous Windows, cette opération est loin d'être simple...
 
@@ -33,16 +33,16 @@ install.packages(cartogramR)
 
 ## Environnement de travail
 
-**1. Créez un nouveua projet**
-**2. Créez un script R**
-**3. Créez un répertoire data pour stocker vos données**
-**4. Créez un répertoire *maps* pour ranger vos cartes**
+1. Créer un nouveau projet
+2. Créer un script R
+3. Créer un répertoire data pour stocker vos données
+4. Créer un répertoire *maps* pour ranger vos cartes
 
-## Import et mise en forme des données
+## Import et préparation des données
 
-Les données utilisées ici sont des données INSSE sur la **populatiion** et les catégories socio professionelles en **2018** au **niveau communal**. L'espace d'étude est le département de l'**Isère**. 
+Les données utilisées ici sont des données INSEE sur la **population** et quelques catégories socio-professionelles en **2018** au **niveau communal**. L'espace d'étude est le département de l'**Isère**.
 
-Le package **sf** (pour simple features), développé principalement par Edzer Pebesma (et Roger Bivan), permet de gérer les objets spatiaux dans R (projections, geotraitements, etc.). C'est le package qui a succedé au package *sp*. 
+Le package **sf** (pour simple features), développé principalement par Edzer Pebesma (et Roger Bivan), permet de gérer les objets spatiaux dans R (projections, geotraitements, etc.). C'est le package qui a succédé au package *sp*. 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 library(sf)
@@ -83,7 +83,7 @@ knitr::kable(communes[c(0:10),], row.names = F, digits = 1)
 ```
 # Exploration des représentations par packages : les classiques
 
-Rappel : il s'agit ici de résoudre la question de la représentation de quantités brutes associées à des surfaces.
+Rappel : il s'agit ici de résoudre la question de la représentation de quantités brutes associées à des surfaces. Quatre possibilités parmi d'autres : les symboles proportionnels, la carte par point (taille unique ou plusieurs tailles), le cartogramme continu.
 
 <img src ="img/proportionnalité_examples.png"></img>
 
@@ -91,7 +91,7 @@ Rappel : il s'agit ici de résoudre la question de la représentation de quantit
 
 **Le package [mapsf](https://riatelab.github.io/mapsf/)** permet de faire des cartes thématiques dans R. C'est le package qui succède au package *cartography* (qui n'est plus maintenu).
 
-Trois solutions existent pour cartographier des quantités brutes associées à des surfaces en cartographie dite "classique" : 
+Dans ce package, trois solutions existent pour cartographier des quantités brutes associées à des surfaces (cartographie dite "classique") : 
 
 - la dot map
 
@@ -203,7 +203,7 @@ dev.off()
 
 ### Dot density map ou carte par points
 
-Il existe plusieurs solutions pour réaliser une carte par point dans R. Ici, nous vous proposeons de créer une fonction qui s'appuie sur *st_sample()* du package *sf*
+Il existe plusieurs solutions pour réaliser une carte par points dans R. Ici, nous vous proposons de créer une fonction qui s'appuie sur *st_sample()* du package *sf*.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results ="hide"}
 dotdensitymap <- function(x,
@@ -245,7 +245,7 @@ dev.off()
 
 <img src ="img/pointsbertin.png"></img>
 
-Les points valués, appelés également "points Bertin" sont une variante de la dot map, avec deux-trois taille de points de référence pour s'adapter à de fortes disparités dans la distribution des effectifs. L'algorithme ci-après approche l'idée en distribuant les effectifs de chaque entité sur une grille sur des points de taille variable.
+Les points valués, appelés également "points Bertin" sont une variante de la dot map, avec deux-trois taille de points de référence pour s'adapter à de fortes disparités dans la distribution des effectifs. L'algorithme ci-après approche l'idée en distribuant les effectifs de chaque entité sur un ensemble de points qui se positionnent sur une grille et dont la taille va s'adapter à l'effectif.
 
 ```{r Bertin, eval = TRUE, message = FALSE, warning = FALSE, results ="hide"}
 # On cacule une grille régulière et on en éxtrait les centroides.
@@ -364,9 +364,9 @@ dev.off()
 
 <img src = "maps/prop2.png"></img>
 
-##  Le cartogramme circulaire de Dorling avec le package packcircles
+##  Entre symboles proportionnels et cartogramme de Dorling : le package packcircles
 
-**Le package [packcirles](https://github.com/mbedward/packcircles) propose 3 algorithmes simples pour déplacer des disques sur un plan 2D de telle sorte qu'ils ne se supperposent pas. Nous pouvons l'utiliser pour créer des cartogrammes de Dorling [@dorling1996area].**
+**Le package [packcirles](https://github.com/mbedward/packcircles) propose 3 algorithmes simples pour déplacer des disques sur un plan 2D de telle sorte qu'ils ne se supperposent pas.** Il reprend le principe du cartogramme de Dorling et permet de gérer la superposition des cercles, améliorant la lisibilité générale de la carte par symboles proportionnels [@dorling1996area].
 
 Création d'un ficher de données simplifié avec les coordonnées des centroïdes des communes.
 
@@ -434,7 +434,7 @@ dev.off()
 
 ## Les 3 formes classiques avec le package cartogram
 
-**le package [cartogram](https://github.com/sjewo/cartogram)** est développé par Sebastian Jeworutzki. Il propose trois méthodes : le cartogramme **circulaire**  de Dorling, continu de Dougenik, Chrisman et Niemeyer et **discontinu** d'Olson).
+**le package [cartogram](https://github.com/sjewo/cartogram)** est développé par Sebastian Jeworutzki. Il propose trois méthodes : le cartogramme **circulaire**  de Dorling, **discontinu** d'Olson et **continu** de Dougenik, Chrisman et Niemeyer).
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 library(cartogram)
@@ -442,7 +442,11 @@ library(cartogram)
 
 ### Le cartogramme circulaire de Dorling
 
-Proche d'un traitement graphique de l'information (le bubble chart), l'algorithme de Danny Dorling permet de visualiser les grandes masses de population en prenant en compte les positions relatives des entités les unes par rapport aux autres.
+Proche d'un traitement graphique de l'information, l'algorithme de Danny Dorling permet de visualiser les grandes masses de population en prenant en compte les positions relatives des entités les unes par rapport aux autres.
+
+<img src ="img/Dorling_exemple.png"></img>
+
+L'algorithme packcircle permet d'approcher le cartogram de Dorling.
 
 ```{r Dorling1, eval = TRUE, message = FALSE, warning = FALSE}
 Dorling = cartogram_dorling(communes, "pop2018", k = 1.8)
@@ -471,13 +475,13 @@ dev.off()
 
 ### Le cartogramme discontinu d'Olson
 
-Judith Olson, en réaction aux premiers cartogrammes continus de Tobler et notamment les problèmes de lisibilité, propose une variation proportionnelle de la surface tout en gardant sa forme "géographique" [@olson1976noncontiguous]
+Judith Olson, en réaction aux premiers cartogrammes continus de Tobler et notamment les problèmes de lisibilité, propose une variation proportionnelle de la surface des entités tout en gardant la forme "géographique" [@olson1976noncontiguous]
 
 ```{r Olson1, eval = TRUE, message = FALSE, warning = FALSE}
 Olson <- cartogram_ncont(communes, "pop2018", k = 1, inplace = TRUE)
 ```
 
-inplace	: Si VRAI, chaque polygone est redimensioné à sa place initiale, si FAUX, les multi-polygones sont centrés sur leur centroïde initial.
+inplace	: Si VRAI, chaque polygone est redimensionné à sa place initiale, si FAUX, les multi-polygones sont centrés sur leur centroïde initial.
 
 ```{r Olson2, eval=TRUE, message=FALSE, warning=FALSE, results=FALSE}
 template("Olson (cartogram)",
@@ -505,14 +509,19 @@ dev.off()
 
 ### Le cartogramme continu Dougenik
 
-James A. Dougenik, Nicholas R. Chrisman et Duane R.Niemeyer, sur la base des premiers travaux de W. Tobler, développent en 1985 un des deux algorithmes les plus implanté dans les outils (avec celui de Gastner et Newman développé en 2004). [@dougenik1985algorithm]
+James A. Dougenik, Nicholas R. Chrisman et Duane R.Niemeyer, sur la base des premiers travaux de W. Tobler, développent en 1985 un des deux algorithmes les plus implanté dans les outils (avec celui de Gastner et Newman développé en 2004). [@dougenik1985algorithm][@dorling_new_1995]
 
-x	: un objet sf
-weight : om de la variable
-itermax	: nombre d'itérations maximum si maxSizeError n'est pas atteint
-maxSizeError : la déformation s'arrete si l'erreur moyenne est inférieur à cette valeur
+x	: un objet sf.
+
+weight : om de la variable.
+
+itermax	: nombre d'itérations maximum si maxSizeError n'est pas atteint.
+
+maxSizeError : la déformation s'arrete si l'erreur moyenne est inférieur à cette valeur.
+
 prepare	: mettre "adjust" permer d'acceler le temps de calcul.
-threshold	: seuil pour la préparation des données
+
+threshold	: seuil pour la préparation des données.
 
 ```{r Dougenik1, eval = TRUE, message = FALSE, warning = FALSE}
 Dougenik <- cartogram_cont(communes, "pop2018", prepare = "none", itermax = 10, maxSizeError = 1.15)
@@ -751,7 +760,7 @@ for(i in 1:nrow(grid)){
 grid <- grid[!is.na(grid$id),]
 ```
 
-Aggregation des hexagones par communes
+Aggrégation des hexagones par communes
 
 ```{r gridcartogram2, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 gridcartogram <- aggregate(x = grid, 
@@ -779,7 +788,9 @@ dev.off()
 
 <img src = "maps/hexcartogram.png"></img>
 
-## Hybride : tessalation et cartograme continu
+## Hybride : tessellation et cartograme continu
+
+Il s'agit d'articuler une simplification des tracés des unités adminsitratives en articuant  une partition de Voronoï (de préférence calculé sur les centre des communes si l'on travaille sur les population) et le cartogramme continu. 
 
 NB : calculer les polygones de voronoi en R est un peu *tricky*. [Voir](https://github.com/r-spatial/sf/issues/474) et [voir](https://stackoverflow.com/questions/45719790/create-voronoi-polygon-with-simple-feature-in-r).
 
@@ -815,7 +826,9 @@ dev.off()
 
 ## L'impossibilité de réaliser un cartogramme rectangulaire avec le package recMap
 
-A ce jour, il n'est pas possible d'automatiser la réalisation de cartogrammes de Demers ou rectangulaire, qui puissent construire et assembler un puzzle respectant surface, contiguité tout en recréant une forme globale à partir de formes carrées ou rectangulaires proportionnelles à des quantités brutes (stock).
+A ce jour, il n'est pas possible d'automatiser la réalisation de cartogrammes de Demers ou rectangulaire, qui puissent construire et assembler un puzzle respectant surface, contiguité tout en recréant une forme globale à partir de formes carrées ou rectangulaires proportionnelles à des quantités brutes (stock). [@van_kreveld_rectangular_2007]
+
+<img src = "img/Rectangular_exemple.png"></img>
 
 Christian Panse a développé une première approche algorithmique que l'on trouve dans le package **Recmap** [@heilmann2004recmap] [@panse2016rectangular]. L'algorithme va convertir les géométries des unités spatiales en rectangles dont la surface est définie par la variable thématique (stock). L'algorithme de RecMap est disponible [ici](https://ieeexplore.ieee.org/document/1382888). Développé en C++11, le package dépend des packages GA (>= 3.1), Rcpp (>= 1.0), sp(>= 1.3)
 
@@ -890,9 +903,9 @@ dev.off()
 # dev.off()
 ```
 
-Attention, il ne fonctionne que sur un nombre limité d’unités territoriales. Ici, l'algo ets incapable de déplacer les rectangles pour creer un cartogramme. Seule solution : exporter en svg et les déplacer à la main. 
+Attention, l'algo est incapable de déplacer les rectangles pour créer un cartogramme lorsque les entités sont très nombreuses. Seule solution : exporter en svg et les déplacer à la main. 
 
-Avec un nombre plus réduit d'unités, il est possible de mener le process jusqu'au bout. Essayons sur l'Europe...
+Avec un nombre plus réduit d'unités, il est possible de mener le process jusqu'au bout. Sur l'Europe, cela donne de meilleurs résultats...
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 europe <-
@@ -960,13 +973,12 @@ S'il résoud la question de la variation de taille en implantation surfacique, l
 Il suffit d'appeler lors de la cartographie de la variable attributaire le fond transformé.
 A priori, le fond transformé correspond à la valeur du dénominateur du taux cartographié (le nombre d'inscrits sur les listes électorales pour cartographier le taux d'abstention, la population active pour un taux de chômage, etc.). Néanmoins lors d'étude sur plusieurs variables socio-démo, on se base souvent sur un fond unique de référence (en général la population résidentielle).
 
-Exemple cartographie de la part de cadres et d'ouvriers
+**Exemple cartographie de la part de cadres et d'ouvriers**
 
-Du coup là on verra pour les variables qu'on propose, juste faire gaffe d'avoir le bon dénominateur pour le calcul du taux, cf.  population 18-65 pour calculer un taux à partir de csp.
+*Comparaison taux de cadres et ouvriers*
 
-Comparaison taux de cadres et ouvriers
-
-Calcul des taux et discrétisation
+* Calcul des taux et discrétisation
+Comme nous ne disposons pas de la population active, on se basera sur la population générale.
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 communes$ouvr_tx <- communes$ouvr / communes$pop2018 * 100
 communes$cadr_tx <- communes$cadr / communes$pop2018 * 100
@@ -982,7 +994,7 @@ cols <-
 ```
 71% de cadres à Oulles, 6 habitants ;-)
 
-Calcul des fonds de carte
+* Calcul des cartogrammes continu, discontinu et circulaire (fonds de carte)
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 Dougenik <- cartogram_cont(communes, "pop2018", prepare = "none", itermax = 10, maxSizeError = 1.15)
 Olson <- cartogram_ncont(communes, "pop2018", k = 1, inplace = TRUE)
@@ -1014,15 +1026,12 @@ mf_map(x=communes, col=NA)
 mf_map(x=Olson,var = "cadr_tx", type = "choro", pal=cols, breaks = bks, add = TRUE)
 ```
 
-Comparaison cadres-ouvriers sur fond transformé (peut-être faut faire versus fond géo)
+Comparaison cadres-ouvriers sur fond transformé
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 par(mfrow = c(1, 2), mar = c(0,0,0,0))
 mf_map(x=Dougenik,var = "cadr_tx", type = "choro", pal=cols, breaks = bks)
 mf_map(x=Dougenik,var = "ouvr_tx", type = "choro", pal=cols, breaks = bks)
 ```
-
-Versus comparaison par la forme qui reproduit en général la répartition de la population lorsque l'on est sur des données démographiques. = cartogramme directement sur les effectifs.
-
 
 # Changement d'échelle !
 
@@ -1114,7 +1123,7 @@ Cela se discute, mais on peut considérer qu'il est plus "propre" de supprimer l
 world_sansNA = na.omit(world)
 ```
 
-Dougenick
+Cartogramme continu
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 templateworld("La population mondiale", "maps/worldDougenick.png")
@@ -1130,7 +1139,7 @@ dev.off()
 
 <img src = "maps/worldDougenick.png"></img>
 
-Dorling
+Cartogramme circulaire
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 templateworld("La population mondiale", "maps/worldDorling.png")
@@ -1146,7 +1155,7 @@ dev.off()
 
 <img src = "maps/worldDorling.png"></img>
 
-Olson
+Cartogramme discontinu
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 templateworld("La population mondiale", "maps/worldOlson.png")
@@ -1181,31 +1190,37 @@ mf_map(x = cartogram_ncont(europe, "pop2008"), col = col)
 dev.off()
 ```
 
+## Cartogramme et étendue spatiale
+
+A mettre en place lors des prolongations, cf. ci-dessous **à vous de jouer ...**
+
 # A vous de jouer...
 
-Et pour pour les afficionados de R, quelques pistes à creuser :
-* travailler l'habillage de la carte : comment automatiser l'ajout d'une légende (surface de référence)
-* améliorer la qualité du cartogramme continu (cf. mesure d'erreur) : repasser l'algorithme sur le fond transformé se heurte souvent à des erreurs de topologie créées par la transformation. Ceci nécessite de passer l'équivalent du "réparer les topologies" de QGIS sur les fonds transformés (opération a éventuellement effectuer par défaut pour un fond plus "propre").
+**Pour prolonger cette exploration des formes géographiques, plusieurs pistes (n'hésitez pas à partager vos expériences avec nous !)**
+
+- travailler l'habillage de la carte : comment automatiser l'ajout d'une légende (surface de référence) cruellement absente sur les représentations
+
+- améliorer la qualité du cartogramme continu (cf. mesure d'erreur) : repasser l'algorithme sur le fond transformé se heurte souvent à des erreurs de topologie créées par la transformation. Ceci nécessite de passer l'équivalent du "réparer les topologies" de QGIS sur les fonds transformés.
+
+- Variable et surface : côté didactique calculer le graphique part variable(%) X surface géo(%) et variable(%) X surface transformée(%). A chaque itération permet de mesurer l'amélioration du cartogramme.
+
+- tester le niveau de généralisation du fond de carte dans le cartogramme continu (du fond détaillé à Voronoï)
 
 ## Un mot sur l'anticartogramme
 
-Eduardo Dutenkefer a exploré l'esthétique des cartogrammes et notamment imaginé l'anti-cartogramme, qui inverse le poids des entités : la surface varie en proportion inverse à la valeur cartographiée.
+Eduardo Dutenkefer [@dutenkefer_cidade_2018] a exploré l'esthétique des cartogrammes et notamment l'anti-cartogramme, qui inverse le poids des entités : la surface varie en proportion inverse à la valeur cartographiée, ce qui équivaut en quelque sorte à représenter des symboles proportionnels ponctuels ou linéaires sur la base 1/valeur de la variable.
 
-Rappel. Le cartogramme a pour objectif par la variation de taille, qui  a un sens bien défini en cartographie, basé sur la perception visuelle (la surface permet d'estimer la part de chaque ou d'un groupe d'entités sur le total), de révéler les inégalités de répartition sur un territoire.
+<img src = "maps/Dutenkefer_exemple.png"></img>
 
-Si on s'en tient au traitement cartogramme de la donnée, l'anticartogramme ne sert à rien dans le cadre d'une analyse des inégalités territoriales. Il serait faux de dire que l'anticartogramme représenterait le contraire (excepté dans le cas où deux variables représenterait la part d'un tout : p. ex. les votes exprimés entre deux candidats, chômeurs et actifs dans la population active, situation où nous sommes de facto en présence d'une relation inverse entre les deux variables).
+La variation de taille a un sens bien défini en cartographie, basé sur la perception visuelle (la surface permet d'estimer la part de chaque ou d'un groupe d'entités sur le total) et l'objectif est de révéler les inégalités de répartition sur un territoire.
 
-Représenter le non poids des lieux ? Un cartogramme de la non population ne représente pas nécessairement les zones dites rurales. A l'échelle mondiale, l'anti-cartogramme des riches n'est pas le cartogramme des pauvres. Les inégalités de répartition de la non-population, du non-PIB, du non CO2, de la même manière que la visualisation des non flux ou une carte des anti flux, où le flux le plus insignifiant devient le plus massif.  Pour révéler et analyser les zones où les effectifs sont faibles, les stocks peu élevés, le traitement de la donnée s'effectue par le filtrage.
+L'anticartogramme ne représente pas le "contraire" (excepté dans le cas où deux variables représenteraient la part d'un tout : p. ex. les votes exprimés entre deux candidats, chômeurs et actifs dans la population active, situation où nous sommes de facto en présence d'une relation inverse entre les deux variables).
+
+Représenter le non poids des lieux ? Attention au sens véhiculé : un cartogramme de la non population ne représente pas nécessairement les zones dites rurales. A l'échelle mondiale, l'anti-cartogramme des riches n'est pas le cartogramme des pauvres. Pour révéler et analyser les zones où les effectifs sont faibles, les stocks peu élevés, le traitement de la donnée s'effectue par le filtrage.
  
-Visualiser le "non poids", créer la "non image" d'un espace peut soutenir un discours artistique, métaphorique sur un espace et non pas à cartographier une variable quantitative.
+Cependant, visualiser le "non poids", créer la "non image" d'un espace peut soutenir un discours artistique, métaphorique sur un espace et prender sa place comme image illustrative.
 
-[@poncet2011antigeographie] Je mettrais plutôt la thèse de Dutenkefer ou son article avec Padovesi Fonseca antérieures au topo de Poncet. Si j'avais eu un peu le temps je les aurais contactés car ils auraient sûrement été très intéressés par Transcarto.
-
-
-Calcul de la valeur du "non phénomène" cartographié (1/)
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
-communes$inverse = 1/communes$pop2018
-```
+Sa réalisation ? Calcul d'une nouvelle variable = 1/variable à "inverser" et application de l'une des méthodes précitée.
 
 # Bibliographie
 
