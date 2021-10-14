@@ -4,7 +4,7 @@ Anne-Christine BRONNER & Nicolas LAMBERT
 
 Aussois, 18 octobre 2021.
 
-> https://transcarto.github.io/rflows/TRANSCARTO_flows.html
+> https://transcarto.github.io/rcartograms/TRANSCARTO_cartograms.html
 
 
 
