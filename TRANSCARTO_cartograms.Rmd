@@ -1210,7 +1210,7 @@ A mettre en place lors des prolongations, cf. ci-dessous **à vous de jouer ...*
 
 Eduardo Dutenkefer [@dutenkefer_cidade_2018] a exploré l'esthétique des cartogrammes et notamment l'anti-cartogramme, qui inverse le poids des entités : la surface varie en proportion inverse à la valeur cartographiée, ce qui équivaut en quelque sorte à représenter des symboles proportionnels ponctuels ou linéaires sur la base 1/valeur de la variable.
 
-<img src = "maps/Dutenkefer_exemple.png"></img>
+<img src = "img/Dutenfeker_exemple.png"></img>
 
 La variation de taille a un sens bien défini en cartographie, basé sur la perception visuelle (la surface permet d'estimer la part de chaque ou d'un groupe d'entités sur le total) et l'objectif est de révéler les inégalités de répartition sur un territoire.
 
