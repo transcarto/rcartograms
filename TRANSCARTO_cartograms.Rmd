@@ -35,8 +35,10 @@ install.packages(cartogramR)
 
 1. Créer un nouveau projet
 2. Créer un script R
-3. Créer un répertoire data pour stocker vos données
+3. Créer un répertoire *data* pour stocker vos données
 4. Créer un répertoire *maps* pour ranger vos cartes
+
+<img src = "img/folders.png"></img>
 
 ## Import et préparation des données
 
