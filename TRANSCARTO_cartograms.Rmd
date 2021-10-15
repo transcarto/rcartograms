@@ -633,7 +633,7 @@ mf_map(
   grid,
   col = NA,
   border = "#6b4266",
-  lwd = 0.05,
+  lwd = 0.5,
   add = TRUE
 )
 dev.off()
