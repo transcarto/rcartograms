@@ -20,14 +20,14 @@ Voici une liste des packages à installer.
 NB : Pour installer le package *cartogramR*, vous aurez besoin d'installer au préalable [FFTW](http://www.fftw.org/). Sous Windows, cette opération est loin d'être simple...
 
 ```{r, eval = FALSE, message = FALSE, warning = FALSE}
-install.packages(knitr)
-install.packages(sf)
-install.packages(mapsf)
-install.packages(packcircles)
-install.packages(cartogram)
-install.packages(recmap)
-install.packages(dplyr)
-install.packages(cartogramR)
+install.packages("knitr")
+install.packages("sf")
+install.packages("mapsf")
+install.packages("packcircles")
+install.packages("cartogram")
+install.packages("recmap")
+install.packages("dplyr")
+install.packages("cartogramR")
 # install.packages("https://cran.r-project.org/src/contrib/Archive/cartogramR/cartogramR_1.0-1.tar.gz", repos = NULL, type = "source")
 ```
 
@@ -499,11 +499,11 @@ x	: un objet sf.
 
 weight : om de la variable.
 
-itermax	: nombre d'itérations maximum si maxSizeError n'est pas atteint.
+itermax	: nombre d'itérations maximum tant que maxSizeError n'est pas atteint.
 
-maxSizeError : la déformation s'arrete si l'erreur moyenne est inférieur à cette valeur.
+maxSizeError : la déformation s'arrête si l'erreur moyenne est inférieure à cette valeur.
 
-prepare	: mettre "adjust" permer d'acceler le temps de calcul.
+prepare	: mettre "adjust" permert d'accélérer le temps de calcul.
 
 threshold	: seuil pour la préparation des données.
 
@@ -557,7 +557,7 @@ dev.off()
 
 <img src = "maps/dougenik.png"></img>
 
-## Les algos pour les cartogrammes continus avec le package cartogramR
+## Les algorithmes pour les cartogrammes continus avec le package cartogramR
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 library(cartogramR)
@@ -622,7 +622,7 @@ dev.off()
 ```
 <img src = "maps/gastnerseguy.png"></img>
 
-La fonction residuals() permet de calculer les erreurs liées à la déformation (erreur relative : taille finale / taille theorique * 100)
+La fonction `residuals()` permet de calculer les erreurs liées à la déformation (erreur relative : taille finale / taille theorique * 100)
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 table = cbind(
@@ -774,9 +774,9 @@ dev.off()
 
 ## Hybride : tessellation et cartograme continu
 
-Il s'agit d'articuler une simplification des tracés des unités adminsitratives en articuant  une partition de Voronoï (de préférence calculé sur les centre des communes si l'on travaille sur les population) et le cartogramme continu. 
+Il s'agit d'articuler une simplification des tracés des unités administratives en articulant une partition de Voronoï (de préférence calculé sur les centre des communes si l'on travaille sur les population) et le cartogramme continu. 
 
-NB : calculer les polygones de voronoi en R est un peu *tricky*. [Voir](https://github.com/r-spatial/sf/issues/474) et [voir](https://stackoverflow.com/questions/45719790/create-voronoi-polygon-with-simple-feature-in-r).
+NB : calculer les polygones de Voronoï en R est un peu *tricky*. [Voir](https://github.com/r-spatial/sf/issues/474) et [voir](https://stackoverflow.com/questions/45719790/create-voronoi-polygon-with-simple-feature-in-r).
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
 c <- st_centroid(communes)
