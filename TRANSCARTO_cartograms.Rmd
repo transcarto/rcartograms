@@ -289,7 +289,7 @@ mf_map(
   col = "#CCCCCC",
   border = "white",
   lwd = 0.5,
-  add = FALSE
+  add = TRUE
 )
 mf_map(
   grid,
