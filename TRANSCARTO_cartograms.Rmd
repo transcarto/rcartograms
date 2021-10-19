@@ -91,7 +91,7 @@ Rappel : il s'agit ici de résoudre la question de la représentation de quantit
 
 ## Rappel en carto "classique" avec le package mapsf
 
-**Le package [mapsf](https://riatelab.github.io/mapsf/)** permet de faire des cartes thématiques dans R. C'est le package qui succède au package *cartography* (qui n'est plus maintenu).
+**Le package [mapsf](https://riatelab.github.io/mapsf/)** permet de faire des cartes thématiques dans R. C'est le package qui succède au package *cartography* (qui est en mode maintenance).
 
 Dans ce package, trois solutions existent pour cartographier des quantités brutes associées à des surfaces (cartographie dite "classique") : 
 
@@ -255,7 +255,6 @@ grid = st_make_grid(communes, cellsize = 1000, square = TRUE)
 grid = st_sf(id = c(1:length(grid)), geometry = grid)
 ids = communes[, "id"] %>% st_drop_geometry()
 ctr = st_centroid(grid)
-
 # On effectue une jointure spatiale (point within polygon)
 for (i in 1:nrow(grid)) {
   x = st_within(
@@ -270,10 +269,8 @@ for (i in 1:nrow(grid)) {
   }
   grid[i, "id"] = id
 }
-
 # On élimine les points qui n'ont pas été intersectés
 grid <- grid[!is.na(grid$id), ]
-
 # On affecte les valeurs aux points
 for (i in 1:nrow(grid)) {
   id = as.character(grid[i, "id"])[1]
@@ -281,7 +278,6 @@ for (i in 1:nrow(grid)) {
   count = nrow(grid[grid$id == id, ])
   grid[i, "pop"] = popAll / count
 }
-
 # Export des données
 st_write(grid, "data/grid.geojson", delete_layer = TRUE)
 ```
@@ -319,7 +315,6 @@ mf_map(
   leg_val_cex	= 0.8,
   leg_title = "Nombre d'habitants, 2018"
 )
-
 dev.off()
 ```
 
@@ -1010,7 +1005,7 @@ géographique, cartogramme continu, discontinu ou de Dorling
 
 Pour les ouvriers
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-par(mfrow = c(2, 2), mar = c(0,0,0,0))
+par(mfrow = c(2, 2))
 mf_map(x=communes,var = "ouvr_tx", type = "choro", pal = cols, breaks = bks)
 mf_map(x=Dougenik,var = "ouvr_tx", type = "choro", pal=cols, breaks = bks)
 mf_map(x=Dorling,var = "ouvr_tx", type = "choro",  pal=cols, breaks = bks)
@@ -1020,7 +1015,7 @@ mf_map(x=Olson,var = "ouvr_tx", type = "choro", pal=cols, breaks = bks, add = TR
 
 Pour les cadres
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-par(mfrow = c(2, 2), mar = c(0,0,0,0))
+par(mfrow = c(2, 2))
 mf_map(x=communes,var = "cadr_tx", type = "choro", pal = cols, breaks = bks)
 mf_map(x=Dougenik,var = "cadr_tx", type = "choro", pal=cols, breaks = bks)
 mf_map(x=Dorling,var = "cadr_tx", type = "choro",  pal=cols, breaks = bks)
@@ -1030,7 +1025,7 @@ mf_map(x=Olson,var = "cadr_tx", type = "choro", pal=cols, breaks = bks, add = TR
 
 Comparaison cadres-ouvriers sur fond transformé
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-par(mfrow = c(1, 2), mar = c(0,0,0,0))
+par(mfrow = c(1, 2))
 mf_map(x=Dougenik,var = "cadr_tx", type = "choro", pal=cols, breaks = bks)
 mf_map(x=Dougenik,var = "ouvr_tx", type = "choro", pal=cols, breaks = bks)
 ```
@@ -1184,7 +1179,7 @@ europe <-
 
 Les formes du monde (le fond de carte en question)
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = FALSE}
-par(mfrow = c(2, 2), mar = c(0, 0, 0, 0))
+par(mfrow = c(2, 2))
 mf_map(europe, col = col)
 mf_map(x = cartogram_cont(europe, "pop2008"), col = col)
 mf_map(x = cartogram_dorling(europe, "pop2008"), col = col)
